@@ -6,6 +6,8 @@
 
 namespace whirl::matrix {
 
+// Virtual time
+
 class Time {
  public:
   Time() = default;
