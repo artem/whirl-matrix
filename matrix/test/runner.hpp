@@ -81,6 +81,7 @@ class TestRunner {
   }
 
   static void ResetLogFile(std::filesystem::path path);
+  static void WriteLogHeader(const std::string& path);
 
  private:
   Simulation sim_;

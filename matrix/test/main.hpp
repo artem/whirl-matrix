@@ -7,7 +7,6 @@
 
 namespace whirl::matrix {
 
-
 int Main(int argc, const char** argv, Simulation sim);
 
 }  // namespace whirl::matrix

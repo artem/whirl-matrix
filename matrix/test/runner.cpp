@@ -100,7 +100,10 @@ void TestRunner::ResetLogFile(fs::path path) {
     fs::resize_file(path, 0);
   }
 
-  // Write header
+  WriteLogHeader(path);
+}
+
+void TestRunner::WriteLogHeader(const std::string& path) {
   std::ofstream log(path);
   log << "Whirl simulator log" << std::endl;
   log.close();
