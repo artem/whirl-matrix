@@ -15,7 +15,7 @@ static void CLI(wheels::ArgumentParser& parser) {
   parser.AddHelpFlag();
 
   parser.Add("det").Flag().Help("Test determinism");
-  parser.Add("sims").ValueDescr("uint").Help("Number of simulations to run");
+  parser.Add("sims").ValueDescr("uint").Optional().Help("Number of simulations to run");
   parser.Add("seed").ValueDescr("uint").Optional();
   parser.Add("log").ValueDescr("path").Optional();
   parser.Add("verbose").Flag().Help("Print debug message");
