@@ -18,7 +18,7 @@ Use Attiya, Bar-Noy, Dolev (ABD) algorithm for linearizable behaviour:
 
 ## Features
 
-* Determinism (concurrency, network, randomness)
+* Determinism (concurrency, time, network, randomness)
 * Time compression
 * Linearizability checker
 * Persistence (via filesystem) and node restarts
