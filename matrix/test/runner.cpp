@@ -1,11 +1,14 @@
 #include <matrix/test/runner.hpp>
 
-#include <matrix/log/file.hpp>
 #include <matrix/new/new.hpp>
 
 #include <wheels/support/assert.hpp>
 
 #include <random>
+#include <fstream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 namespace whirl::matrix {
 
@@ -85,6 +88,22 @@ void TestRunner::Fail() {
   std::cout << "(ﾉಥ益ಥ）ﾉ ┻━┻" << std::endl;
   std::cout.flush();
   std::exit(1);
+}
+
+void TestRunner::ResetLogFile(fs::path path) {
+  if (!fs::exists(path.parent_path())) {
+    WHEELS_PANIC(
+        "Log directory does not exist: " << path.parent_path());
+  }
+
+  if (fs::exists(path)) {
+    fs::resize_file(path, 0);
+  }
+
+  // Write header
+  std::ofstream log(path);
+  log << "Whirl simulator log" << std::endl;
+  log.close();
 }
 
 }  // namespace whirl::matrix

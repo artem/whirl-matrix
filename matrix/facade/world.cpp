@@ -45,6 +45,10 @@ void World::AddAdversary(node::program::Main program) {
   impl_->SetAdversary(program);
 }
 
+void World::WriteLogTo(std::string fpath) {
+  impl_->WriteLogTo(fpath);
+}
+
 void World::Start() {
   impl_->Start();
 }

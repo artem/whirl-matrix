@@ -9,19 +9,16 @@
 namespace whirl::matrix::log {
 
 LogBackend::LogBackend() {
-#ifndef NDEBUG
-  file_ = GetLogFile();
-#endif
   InitLevels();
 }
 
 void LogBackend::Write(const LogEvent& event) {
   events_.push_back(event);
 
-#ifndef NDEBUG
-  FormatLogEventTo(event, file_);
-  file_ << std::endl;
-#endif
+  if (file_.has_value()) {
+    FormatLogEventTo(event, *file_);
+    *file_ << std::endl;
+  }
 }
 
 static timber::Level kDefaultMinLogLevel = timber::Level::Info;
@@ -40,6 +37,13 @@ timber::Level LogBackend::GetMinLevelFor(const std::string& component) const {
 void LogBackend::Log(timber::Event event) {
   GlobalAllocatorGuard g;
   Write(MakeLogEvent(event));
+}
+
+void LogBackend::AppendToFile(const std::string& path) {
+  file_.emplace(path, std::ofstream::out | std::ofstream::app);
+
+  // Write simulation separator
+  *file_ << std::string(80, '-') << std::endl;
 }
 
 }  // namespace whirl::matrix::log

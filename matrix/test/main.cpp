@@ -1,8 +1,5 @@
 #include <matrix/test/main.hpp>
 
-#include <matrix/log/file.hpp>
-#include <matrix/new/new.hpp>
-
 #include <wheels/cmdline/argparse.hpp>
 
 #include <iostream>
@@ -41,9 +38,6 @@ int Main(int argc, const char** argv, Simulation sim) {
   wheels::ParsedArgs args = parser.Parse(argc, argv);
 
   TestRunner runner{sim};
-
-  // Initialize
-  log::GetLogFile();
 
   if (args.Has("log")) {
     runner.WriteLogTo(args.Get("log"));

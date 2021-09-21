@@ -407,6 +407,12 @@ size_t RunSimulation(size_t seed) {
 
   world.AddAdversary(Adversary);
 
+  // Log file
+  auto log_fpath = runner.LogFile();
+  if (log_fpath) {
+    world.WriteLogTo(*log_fpath);
+  }
+
   // Globals
   world.SetGlobal("keys", keys);
   world.InitCounter("requests", 0);

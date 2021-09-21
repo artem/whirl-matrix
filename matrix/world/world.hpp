@@ -96,6 +96,10 @@ class World {
     time_model_ = std::move(time_model);
   }
 
+  void WriteLogTo(std::string fpath) {
+    log_.AppendToFile(fpath);
+  }
+
   void Start();
 
   // Returns false if simulation is in deadlock state

@@ -2,12 +2,13 @@
 
 #include <matrix/log/event.hpp>
 #include <matrix/log/env.hpp>
-#include <matrix/log/file.hpp>
 
 #include <timber/backend.hpp>
 
+#include <optional>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <vector>
 
 namespace whirl::matrix::log {
@@ -24,6 +25,10 @@ class LogBackend : public timber::ILogBackend {
   // Context: Server
   void Log(timber::Event event) override;
 
+  // Matrix
+
+  void AppendToFile(const std::string& path);
+
   const EventLog& GetEvents() const {
     return events_;
   }
@@ -37,7 +42,7 @@ class LogBackend : public timber::ILogBackend {
   LogLevels levels_;
 
   EventLog events_;
-  std::ofstream file_;
+  std::optional<std::ofstream> file_;
 };
 
 }  // namespace whirl::matrix::log

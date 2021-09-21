@@ -114,6 +114,8 @@ class World {
     return GetGlobal<size_t>(name);
   }
 
+  void WriteLogTo(std::string fpath);
+
   void Start();
 
   bool Step();

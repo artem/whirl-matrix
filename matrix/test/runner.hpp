@@ -7,6 +7,8 @@
 
 #include <fmt/core.h>
 
+#include <filesystem>
+
 #include <iostream>
 #include <sstream>
 
@@ -23,12 +25,9 @@ class TestRunner {
     verbose_ = true;
   }
 
-  void WriteLogTo(std::string path) {
-    log_file_.emplace(path);
-  }
-
-  bool IsVerbose() const {
-    return verbose_;
+  void WriteLogTo(const std::string& path) {
+    log_path_.emplace(path);
+    ResetLogFile(path);
   }
 
   // Run
@@ -43,7 +42,7 @@ class TestRunner {
   // Options
 
   std::optional<std::string> LogFile() const {
-    return log_file_;
+    return log_path_;
   };
 
   // Output streams
@@ -81,11 +80,13 @@ class TestRunner {
     sink_.swap(tmp);
   }
 
+  static void ResetLogFile(std::filesystem::path path);
+
  private:
   Simulation sim_;
 
   bool verbose_{false};
-  std::optional<std::string> log_file_;
+  std::optional<std::filesystem::path> log_path_;
 
   std::stringstream sink_;
 };
