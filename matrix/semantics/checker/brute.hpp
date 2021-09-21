@@ -3,7 +3,7 @@
 #include <matrix/semantics/history.hpp>
 #include <matrix/semantics/checker/real_time_order.hpp>
 
-namespace whirl::histories {
+namespace whirl::matrix::semantics {
 
 //////////////////////////////////////////////////////////////////////
 
@@ -133,4 +133,4 @@ bool LinCheckBrute(const History& history, size_t time_limit) {
   return ok;
 }
 
-}  // namespace whirl::histories
+}  // namespace whirl::matrix::semantics

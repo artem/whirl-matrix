@@ -13,7 +13,7 @@
 #include <vector>
 #include <optional>
 
-namespace whirl::histories {
+namespace whirl::matrix::semantics {
 
 //////////////////////////////////////////////////////////////////////
 
@@ -95,4 +95,4 @@ using History = std::vector<Call>;
 
 //////////////////////////////////////////////////////////////////////
 
-}  // namespace whirl::histories
+}  // namespace whirl::matrix::semantics

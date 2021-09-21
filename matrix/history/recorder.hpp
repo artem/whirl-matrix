@@ -10,9 +10,9 @@ namespace whirl::matrix {
 class HistoryRecorder {
   struct RunningCall {
     std::string method;
-    histories::Arguments arguments;
+    semantics::Arguments arguments;
     TimePoint start_time;
-    histories::CallLabels labels;
+    semantics::CallLabels labels;
   };
 
  public:
@@ -40,18 +40,18 @@ class HistoryRecorder {
   void Finalize();
 
   // After Finalize
-  const histories::History& GetHistory() const {
+  const semantics::History& GetHistory() const {
     return finalized_calls_;
   }
 
  private:
   // Finalizers
-  static histories::Call Complete(const RunningCall& call,
-                                  histories::Value output);
-  static histories::Call Lost(const RunningCall& call);
+  static semantics::Call Complete(const RunningCall& call,
+                                  semantics::Value output);
+  static semantics::Call Lost(const RunningCall& call);
 
  private:
-  std::vector<histories::Call> finalized_calls_;
+  std::vector<semantics::Call> finalized_calls_;
   Cookie next_id_{0};
   std::map<Cookie, RunningCall> running_calls_;
 };

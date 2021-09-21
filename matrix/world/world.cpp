@@ -73,7 +73,7 @@ const log::EventLog& World::EventLog() const {
   return impl_->GetLog().GetEvents();
 }
 
-const histories::History& World::History() const {
+const semantics::History& World::History() const {
   return impl_->History();
 }
 

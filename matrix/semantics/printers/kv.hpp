@@ -5,7 +5,7 @@
 
 #include <sstream>
 
-namespace whirl::histories {
+namespace whirl::matrix::semantics {
 
 //////////////////////////////////////////////////////////////////////
 
@@ -80,4 +80,4 @@ void PrintKVHistory(const History& history, std::ostream& out) {
   Print<KVCallPrinter<K, V>>(history, out);
 }
 
-}  // namespace whirl::histories
+}  // namespace whirl::matrix::semantics

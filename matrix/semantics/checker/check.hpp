@@ -3,7 +3,7 @@
 #include <matrix/semantics/history.hpp>
 #include <matrix/semantics/checker/brute.hpp>
 
-namespace whirl::histories {
+namespace whirl::matrix::semantics {
 
 // Remove not completed read-only calls
 template <typename Model>
@@ -41,4 +41,4 @@ bool LinCheck(History history) {
   return true;
 }
 
-}  // namespace whirl::histories
+}  // namespace whirl::matrix::semantics

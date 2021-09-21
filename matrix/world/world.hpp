@@ -123,7 +123,7 @@ class World {
   Jiffies TimeElapsed() const;
 
   const log::EventLog& EventLog() const;
-  const histories::History& History() const;
+  const semantics::History& History() const;
 
   std::vector<std::string> GetStdout(const std::string& hostname) const;
 

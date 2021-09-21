@@ -6,7 +6,7 @@
 #include <string>
 #include <set>
 
-namespace whirl::histories {
+namespace whirl::matrix::semantics {
 
 //////////////////////////////////////////////////////////////////////
 
@@ -87,4 +87,4 @@ void Print(const History& history, std::ostream& out) {
   }
 }
 
-}  // namespace whirl::histories
+}  // namespace whirl::matrix::semantics

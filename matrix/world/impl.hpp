@@ -167,7 +167,7 @@ class WorldImpl {
     return hosts;
   }
 
-  const histories::History& History() const {
+  const semantics::History& History() const {
     return history_recorder_.GetHistory();
   }
 
