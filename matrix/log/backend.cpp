@@ -12,7 +12,7 @@ LogBackend::LogBackend() {
   InitLevels();
 }
 
-void LogBackend::Write(const LogEvent& event) {
+void LogBackend::Write(const Event& event) {
   events_.push_back(event);
 
   if (file_.has_value()) {
@@ -36,7 +36,7 @@ timber::Level LogBackend::GetMinLevelFor(const std::string& component) const {
 
 void LogBackend::Log(timber::Event event) {
   GlobalAllocatorGuard g;
-  Write(MakeLogEvent(event));
+  Write(MakeMatrixEvent(event));
 }
 
 void LogBackend::AppendToFile(const std::string& path) {

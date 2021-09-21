@@ -48,8 +48,8 @@ static std::string DescribeThisActor() {
 
 //////////////////////////////////////////////////////////////////////
 
-LogEvent MakeLogEvent(const timber::Event& e) {
-  LogEvent event;
+Event MakeMatrixEvent(const timber::Event& e) {
+  Event event;
 
   event.time = GlobalNow();
   event.step = WorldStepNumber();

@@ -16,7 +16,7 @@ static std::string_view LimitWidth(std::string_view str, size_t width) {
 
 #define _FMT(str, width) std::setw(width) << LimitWidth(str, width)
 
-void FormatLogEventTo(const LogEvent& event, std::ostream& out) {
+void FormatLogEventTo(const Event& event, std::ostream& out) {
   // clang-format off
 
   out << std::left

@@ -12,7 +12,7 @@ namespace whirl::matrix::log {
 
 //////////////////////////////////////////////////////////////////////
 
-struct LogEvent {
+struct Event {
   TimePoint time;
   size_t step;
   timber::Level level;
@@ -25,10 +25,10 @@ struct LogEvent {
 //////////////////////////////////////////////////////////////////////
 
 // Capture event context
-LogEvent MakeLogEvent(const timber::Event& event);
+Event MakeMatrixEvent(const timber::Event& event);
 
 //////////////////////////////////////////////////////////////////////
 
-using EventLog = std::vector<LogEvent>;
+using EventLog = std::vector<Event>;
 
 }  // namespace whirl::matrix::log

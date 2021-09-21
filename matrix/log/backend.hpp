@@ -34,7 +34,7 @@ class LogBackend : public timber::ILogBackend {
   }
 
  private:
-  void Write(const LogEvent& event);
+  void Write(const Event& event);
 
   void InitLevels();
 

@@ -6,6 +6,6 @@
 
 namespace whirl::matrix::log {
 
-void FormatLogEventTo(const LogEvent& event, std::ostream& out);
+void FormatLogEventTo(const Event& event, std::ostream& out);
 
 }  // namespace whirl::matrix::log
