@@ -1,6 +1,7 @@
 #include <matrix/new/new.hpp>
 
 #include <matrix/new/tracker.hpp>
+#include <matrix/new/debug.hpp>
 
 #include <wheels/support/panic.hpp>
 
@@ -45,7 +46,7 @@ static void FreeGlobal(void* addr) {
   global_allocs_tracker.Deallocate(addr);
 }
 
-namespace whirl::matrix {
+//////////////////////////////////////////////////////////////////////
 
 uintptr_t GlobalAllocsCheckSum() {
   return global_allocs_checksum;
@@ -58,8 +59,6 @@ void ActivateAllocsTracker() {
 void PrintAllocsTrackerReport() {
   global_allocs_tracker.PrintReport();
 }
-
-}  // namespace whirl::matrix
 
 //////////////////////////////////////////////////////////////////////
 

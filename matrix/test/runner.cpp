@@ -1,6 +1,6 @@
 #include <matrix/test/runner.hpp>
 
-#include <matrix/new/new.hpp>
+#include <matrix/new/debug.hpp>
 
 #include <wheels/support/assert.hpp>
 

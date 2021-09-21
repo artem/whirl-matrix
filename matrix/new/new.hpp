@@ -50,11 +50,6 @@ class GlobalAllocatorGuard : public AllocatorGuard {
   }
 };
 
-//////////////////////////////////////////////////////////////////////
 
-uintptr_t GlobalAllocsCheckSum();
-
-void ActivateAllocsTracker();
-void PrintAllocsTrackerReport();
 
 }  // namespace whirl::matrix
