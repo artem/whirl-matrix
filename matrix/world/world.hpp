@@ -236,6 +236,14 @@ class World {
     AddActor(&pool.back());
   }
 
+  size_t ClusterSize() const {
+    size_t count = 0;
+    for (auto& [_, pool] : pools_) {
+      count += pool.size();
+    }
+    return count;
+  }
+
   Server* FindServer(const std::string& hostname) {
     for (auto& [_, pool] : pools_) {
       for (Server& server : pool) {

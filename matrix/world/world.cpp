@@ -45,7 +45,7 @@ void World::Start() {
   AddActor(&network_);
   Scope(network_)->Start();
 
-  LOG_INFO("Cluster: ?, clients: {}", clients_.size());
+  LOG_INFO("Cluster: {}, clients: {}", ClusterSize(), clients_.size());
 
   LOG_INFO("Starting cluster...");
 
