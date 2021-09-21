@@ -1,141 +1,305 @@
 #pragma once
 
+#include <matrix/time/time.hpp>
+#include <matrix/server/server.hpp>
+#include <matrix/network/network.hpp>
+#include <matrix/world/actor.hpp>
+#include <matrix/world/actor_ctx.hpp>
+#include <matrix/world/random_source.hpp>
 #include <matrix/world/time_model.hpp>
-#include <matrix/log/event.hpp>
-#include <matrix/semantics/history.hpp>
-#include <whirl/node/program/main.hpp>
+#include <matrix/history/recorder.hpp>
+#include <matrix/log/backend.hpp>
 
-#include <memory>
-#include <ostream>
-#include <any>
+#include <matrix/helpers/digest.hpp>
+#include <matrix/helpers/untyped_dict.hpp>
+
+#include <whirl/node/guid/guid.hpp>
+
+#include <timber/logger.hpp>
+
+#include <wheels/support/id.hpp>
+
+#include <deque>
+#include <vector>
 
 namespace whirl::matrix {
 
-// Facade
-
 //////////////////////////////////////////////////////////////////////
 
-class World;
+struct NextStep {
+  IActor* actor;
+  TimePoint time;
+  size_t actor_index;
 
-//////////////////////////////////////////////////////////////////////
-
-class PoolBuilder {
- public:
-  PoolBuilder(World* world, std::string pool_name, node::program::Main program)
-      : world_(world),
-        pool_name_(pool_name),
-        program_(program),
-        name_template_(MakeNameTemplate(pool_name)) {
+  static NextStep NoStep() {
+    return {nullptr, 0, 0};
   }
-
-  PoolBuilder& Size(size_t value) {
-    size_ = value;
-    return *this;
-  }
-
-  PoolBuilder& NameTemplate(std::string value) {
-    name_template_ = value;
-    return *this;
-  }
-
-  // Add pool to the world
-  ~PoolBuilder();
-
- private:
-  static std::string MakeNameTemplate(std::string pool_name) {
-    return std::string("Server-") + pool_name;
-  }
-
- private:
-  World* world_;
-
-  std::string pool_name_;
-  node::program::Main program_;
-  size_t size_ = 1;
-  std::string name_template_;
 };
 
 //////////////////////////////////////////////////////////////////////
 
-class WorldImpl;
-
 class World {
-  static const size_t kDefaultSeed = 42;
+  struct WorldGuard {
+    WorldGuard(World* world);
+    ~WorldGuard();
+  };
 
-  friend class PoolBuilder;
+  using Servers = std::deque<Server>;
 
  public:
-  World(size_t seed = kDefaultSeed);
-  ~World();
-
-  size_t Seed() const;
-
-  void AddServer(std::string hostname, node::program::Main program);
-
-  PoolBuilder MakePool(std::string pool_name, node::program::Main program) {
-    return PoolBuilder{this, pool_name, program};
+  World(size_t seed)
+      : seed_(seed),
+        random_source_(seed),
+        time_model_(DefaultTimeModel()),
+        network_(&log_),
+        logger_("World", &log_) {
   }
 
-  void AddClient(node::program::Main program);
-  void AddClients(node::program::Main program, size_t count);
+  void AddServer(std::string hostname, node::program::Main program) {
+    WorldGuard g(this);
 
-  void SetTimeModel(ITimeModelPtr time_model);
+    static const std::string kPoolName = "snowflakes";
 
-  void AddAdversary(node::program::Main program);
-
-  // Globals
-
-  template <typename T>
-  void SetGlobal(const std::string& key, T value) {
-    SetGlobalImpl(key, value);
+    Servers& pool = pools_[kPoolName];
+    return AddServerImpl(pool, program, kPoolName, hostname);
   }
 
-  template <typename T>
-  T GetGlobal(const std::string& key) const {
-    auto value = GetGlobalImpl(key);
-    return std::any_cast<T>(value);
+  void AddPool(std::string pool_name, node::program::Main program, size_t size,
+               std::string name_template) {
+    WorldGuard g(this);
+
+    Servers& pool = pools_[pool_name];
+    for (size_t i = 0; i < size; ++i) {
+      AddToPool(pool, program, pool_name, name_template);
+    }
   }
 
-  // Global counters
+  void AddClient(node::program::Main program) {
+    WorldGuard g(this);
 
-  void InitCounter(const std::string& name, size_t value = 0) {
-    SetGlobal(name, value);
+    AddToPool(clients_, program,
+              /*pool_name=*/"clients",
+              /*host_name_template=*/"Client");
   }
 
-  size_t GetCounter(const std::string& name) const {
-    return GetGlobal<size_t>(name);
+  void SetAdversary(node::program::Main program) {
+    WorldGuard g(this);
+
+    AddToPool(adversaries_, program,
+              /*pool_name=*/"adversaries",
+              /*host_name_template=*/"Adversary");
+  }
+
+  bool HasAdversary() const {
+    return !adversaries_.empty();
+  }
+
+  void SetTimeModel(ITimeModelPtr time_model) {
+    time_model_ = std::move(time_model);
   }
 
   void Start();
 
+  // Returns false if simulation is in deadlock state
   bool Step();
-  void MakeSteps(size_t count);
 
-  // For tests
-  void RestartServer(const std::string& hostname);
-
-  // Returns simulation digest
+  // Stop simulation and compute digest
   size_t Stop();
 
-  size_t Digest() const;
+  // Returns number of steps actually made
+  size_t MakeSteps(size_t steps);
 
-  size_t StepCount() const;
-  Jiffies TimeElapsed() const;
+  // Time budget is _virtual_!
+  void RunFor(Jiffies time_budget);
 
-  const log::EventLog& EventLog() const;
-  const semantics::History& History() const;
+  void RestartServer(const std::string& hostname);
 
-  std::vector<std::string> GetStdout(const std::string& hostname) const;
+  size_t NumClients() const {
+    return clients_.size();
+  }
+
+  // Methods used by running actors
+
+  static World* Access();
+
+  size_t Seed() const {
+    return seed_;
+  }
+
+  size_t Digest() const {
+    return digest_.GetValue();
+  }
+
+  Server& GetServer(const std::string& hostname) {
+    return *FindServer(hostname);
+  }
+
+  net::Network& GetNetwork() {
+    return network_;
+  }
+
+  size_t CurrentStep() const {
+    return step_number_;
+  }
+
+  log::LogBackend& GetLog() {
+    return log_;
+  }
+
+  HistoryRecorder& GetHistoryRecorder() {
+    return history_recorder_;
+  }
+
+  // Context: Server
+  std::vector<std::string> GetPool(const std::string& name) {
+    auto it = pools_.find(name);
+
+    if (it == pools_.end()) {
+      return {};
+    }
+
+    Servers& pool = it->second;
+
+    std::vector<std::string> hosts;
+    for (auto& server : pool) {
+      hosts.push_back(server.HostName());
+    }
+    return hosts;
+  }
+
+  const semantics::History& History() const {
+    return history_recorder_.GetHistory();
+  }
+
+  std::vector<std::string> GetStdout(const std::string& hostname) {
+    const Server* server = FindServer(hostname);
+    return server->GetStdout();
+  }
+
+  TimePoint Now() const {
+    return time_.Now();
+  }
+
+  Jiffies TimeElapsed() const {
+    return time_.Now() - start_time_;
+  }
+
+  uint64_t RandomNumber() {
+    return random_source_.Next();
+  }
+
+  ITimeModel* TimeModel() const {
+    return time_model_.get();
+  }
+
+  IActor* CurrentActor() const {
+    return active_.Get();
+  }
+
+  void SetGlobal(const std::string& name, std::any value) {
+    globals_.Set(name, value);
+  }
+
+  std::any GetGlobal(const std::string& name) const {
+    return globals_.Get(name);
+  }
+
+  node::Guid GenerateGuid() {
+    return fmt::format("guid-{}", guids_.NextId());
+  }
 
  private:
-  void AddPool(std::string pool_name, node::program::Main program, size_t size,
-               std::string server_name_template);
+  static ITimeModelPtr DefaultTimeModel();
 
-  void SetGlobalImpl(const std::string& key, std::any value);
-  std::any GetGlobalImpl(const std::string& key) const;
+  std::string MakeServerName(std::string name_template, size_t index) {
+    wheels::StringBuilder name;
+    name << name_template << '-' << index;
+    return name;
+  }
+
+  void AddToPool(Servers& pool, node::program::Main program,
+                 std::string pool_name, std::string host_name_template) {
+    auto host_name = MakeServerName(host_name_template, pool.size() + 1);
+    AddServerImpl(pool, program, pool_name, host_name);
+  }
+
+  // Returns host name
+  void AddServerImpl(Servers& pool, node::program::Main program,
+                     std::string pool_name, std::string hostname) {
+    size_t id = server_ids_.NextId();
+
+    pool.emplace_back(network_, ServerConfig{id, hostname, pool_name}, program);
+
+    network_.AddServer(&pool.back());
+    AddActor(&pool.back());
+  }
+
+  Server* FindServer(const std::string& hostname) {
+    for (auto& [_, pool] : pools_) {
+      for (Server& server : pool) {
+        if (server.HostName() == hostname) {
+          return &server;
+        }
+      }
+    }
+    return nullptr;
+  }
+
+  void SetStartTime() {
+    time_.FastForwardTo(TimeModel()->GlobalStartTime());
+  }
+
+  ActorContext::ScopeGuard Scope(IActor& actor) {
+    return Scope(&actor);
+  }
+
+  ActorContext::ScopeGuard Scope(IActor* actor) {
+    return active_.Scope(actor);
+  }
+
+  void AddActor(IActor* actor) {
+    actors_.push_back(actor);
+  }
+
+  NextStep FindNextStep();
 
  private:
-  std::unique_ptr<WorldImpl> impl_;
+  const size_t seed_;
+
+  Time time_;
+  RandomSource random_source_;
+  wheels::IdGenerator guids_;
+
+  ITimeModelPtr time_model_;
+
+  log::LogBackend log_;
+
+  // Actors
+
+  std::map<std::string, Servers> pools_;
+  Servers clients_;
+  // O or 1
+  Servers adversaries_;
+
+  wheels::IdGenerator server_ids_;
+
+  net::Network network_;
+
+  // Event loop
+
+  std::vector<IActor*> actors_;
+  ActorContext active_;
+
+  size_t step_number_{0};
+
+  TimePoint start_time_;
+
+  DigestCalculator digest_;
+  HistoryRecorder history_recorder_;
+
+  UntypedDict globals_;
+
+  timber::Logger logger_;
 };
 
 }  // namespace whirl::matrix

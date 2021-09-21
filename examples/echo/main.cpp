@@ -20,7 +20,7 @@
 #include <cereal/types/string.hpp>
 
 // Simulation
-#include <matrix/world/world.hpp>
+#include <matrix/facade/world.hpp>
 #include <matrix/client/main.hpp>
 #include <matrix/client/rpc.hpp>
 #include <matrix/test/event_log.hpp>
@@ -141,7 +141,7 @@ void EchoNode() {
 int main() {
   static const size_t kSeed = 17;
 
-  matrix::World world{kSeed};
+  matrix::facade::World world{kSeed};
 
   world.MakePool("echo", EchoNode)
       .Size(3)

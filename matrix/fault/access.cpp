@@ -1,15 +1,15 @@
 #include <matrix/fault/access.hpp>
 
-#include <matrix/world/impl.hpp>
+#include <matrix/world/world.hpp>
 
 namespace whirl::matrix::fault {
 
 IFaultyServer& Server(const std::string& hostname) {
-  return WorldImpl::Access()->GetServer(hostname);
+  return World::Access()->GetServer(hostname);
 }
 
 IFaultyNetwork& Network() {
-  return WorldImpl::Access()->GetNetwork();
+  return World::Access()->GetNetwork();
 }
 
 }  // namespace whirl::matrix::fault

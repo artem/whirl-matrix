@@ -1,6 +1,6 @@
 #pragma once
 
-#include <matrix/world/world.hpp>
+#include <matrix/facade/world.hpp>
 
 #include <whirl/matrix/history/printers/print.hpp>
 

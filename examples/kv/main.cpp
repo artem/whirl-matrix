@@ -25,7 +25,7 @@
 #include <await/futures/util/never.hpp>
 
 // Simulation
-#include <matrix/world/world.hpp>
+#include <matrix/facade/world.hpp>
 #include <matrix/world/global/vars.hpp>
 #include <matrix/client/main.hpp>
 #include <matrix/client/rpc.hpp>
@@ -402,7 +402,7 @@ size_t RunSimulation(size_t seed) {
   // Reset RPC ids
   commute::rpc::ResetIds();
 
-  matrix::World world{seed};
+  matrix::facade::World world{seed};
 
   // Cluster
   world.MakePool("kv", KVNode).Size(replicas);

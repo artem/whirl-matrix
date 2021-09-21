@@ -1,11 +1,11 @@
 #include <matrix/world/global/global.hpp>
 
-#include <matrix/world/impl.hpp>
+#include <matrix/world/world.hpp>
 
 namespace whirl::matrix {
 
-static WorldImpl* ThisWorld() {
-  return WorldImpl::Access();
+static World* ThisWorld() {
+  return World::Access();
 }
 
 //////////////////////////////////////////////////////////////////////

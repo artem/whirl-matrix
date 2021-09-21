@@ -1,100 +1,187 @@
 #include <matrix/world/world.hpp>
 
-#include <matrix/world/impl.hpp>
+#include <matrix/world/time_models/crazy.hpp>
+
+#include <matrix/runtime/setup.hpp>
+
+#include <timber/log.hpp>
 
 namespace whirl::matrix {
 
-PoolBuilder::~PoolBuilder() {
-  world_->AddPool(pool_name_, program_, size_, name_template_);
+//////////////////////////////////////////////////////////////////////
+
+static World* this_world = nullptr;
+
+World::WorldGuard::WorldGuard(World* world) {
+  this_world = world;
 }
 
-World::World(size_t seed) : impl_(std::make_unique<WorldImpl>(seed)) {
+World::WorldGuard::~WorldGuard() {
+  this_world = nullptr;
 }
 
-World::~World() {
+World* World::Access() {
+  WHEELS_VERIFY(this_world != nullptr, "Not in world context");
+  return this_world;
 }
 
-size_t World::Seed() const {
-  return impl_->Seed();
-}
+//////////////////////////////////////////////////////////////////////
 
-void World::AddServer(std::string hostname, node::program::Main program) {
-  impl_->AddServer(hostname, program);
-}
-
-void World::AddPool(std::string pool_name, node::program::Main program,
-                    size_t size, std::string server_name_template) {
-  impl_->AddPool(pool_name, program, size, server_name_template);
-}
-
-void World::AddClient(node::program::Main program) {
-  impl_->AddClient(program);
-}
-
-void World::AddClients(node::program::Main program, size_t count) {
-  for (size_t i = 0; i < count; ++i) {
-    AddClient(program);
-  }
-}
-
-void World::SetTimeModel(ITimeModelPtr time_model) {
-  impl_->SetTimeModel(std::move(time_model));
-}
-
-void World::AddAdversary(node::program::Main program) {
-  impl_->SetAdversary(program);
+ITimeModelPtr World::DefaultTimeModel() {
+  return MakeCrazyTimeModel();
 }
 
 void World::Start() {
-  impl_->Start();
+  WorldGuard g(this);
+
+  SetupMatrixRuntime();
+
+  LOG_INFO("Seed: {}", seed_);
+
+  SetStartTime();
+  start_time_ = time_.Now();
+
+  // Start network:
+  AddActor(&network_);
+  Scope(network_)->Start();
+
+  LOG_INFO("Cluster: ?, clients: {}", clients_.size());
+
+  LOG_INFO("Starting cluster...");
+
+  // Start servers
+  for (auto& [_, pool] : pools_) {
+    for (auto& server : pool) {
+      Scope(server)->Start();
+    }
+  }
+
+  LOG_INFO("Starting clients...");
+
+  // Start clients
+  for (auto& client : clients_) {
+    Scope(client)->Start();
+  }
+
+  // Start adversary
+  if (!adversaries_.empty()) {
+    LOG_INFO("Starting adversary...");
+    Scope(adversaries_.front())->Start();
+  }
+
+  LOG_INFO("World started");
 }
 
 bool World::Step() {
-  return impl_->Step();
+  WorldGuard g(this);
+
+  NextStep next = FindNextStep();
+  if (!next.actor) {
+    return false;
+  }
+
+  ++step_number_;
+
+  digest_.Eat(next.time).Eat(next.actor_index);
+
+  time_.FastForwardTo(next.time);
+  Scope(next.actor)->Step();
+
+  return true;
 }
 
-void World::MakeSteps(size_t count) {
-  impl_->MakeSteps(count);
-}
+NextStep World::FindNextStep() {
+  if (actors_.empty()) {
+    return NextStep::NoStep();
+  }
 
-void World::RestartServer(const std::string& hostname) {
-  impl_->RestartServer(hostname);
+  auto next_step = NextStep::NoStep();
+
+  for (size_t i = 0; i < actors_.size(); ++i) {
+    IActor* actor = actors_[i];
+
+    if (actor->IsRunnable()) {
+      TimePoint next_step_time = actor->NextStepTime();
+
+      if (!next_step.actor || next_step_time < next_step.time) {
+        next_step.actor = actor;
+        next_step.time = next_step_time;
+        next_step.actor_index = i;
+      }
+    }
+  }
+
+  return next_step;
 }
 
 size_t World::Stop() {
-  return impl_->Stop();
+  WorldGuard g(this);
+
+  // Adversary
+  if (!adversaries_.empty()) {
+    Scope(adversaries_.front())->Shutdown();
+  }
+
+  LOG_INFO("Adversary stopped");
+
+  // Network
+  digest_.Combine(network_.Digest());
+  Scope(network_)->Shutdown();
+
+  LOG_INFO("Network stopped");
+
+  // Servers
+  for (auto& [_, pool] : pools_) {
+    for (auto& server : pool) {
+      digest_.Combine(server.ComputeDigest());
+      Scope(server)->Shutdown();
+    }
+    pool.clear();
+  }
+  pools_.clear();
+
+  LOG_INFO("Servers stopped");
+
+  // Clients
+  for (auto& client : clients_) {
+    Scope(client)->Shutdown();
+  }
+  clients_.clear();
+
+  LOG_INFO("Clients stopped");
+
+  actors_.clear();
+
+  history_recorder_.Finalize();
+
+  LOG_INFO("Simulation stopped");
+
+  return Digest();
 }
 
-size_t World::Digest() const {
-  return impl_->Digest();
+size_t World::MakeSteps(size_t steps) {
+  size_t steps_made = 0;
+  for (size_t i = 0; i < steps; ++i) {
+    if (!Step()) {
+      break;
+    }
+    ++steps_made;
+  }
+  return steps_made;
 }
 
-const log::EventLog& World::EventLog() const {
-  return impl_->GetLog().GetEvents();
+void World::RunFor(Jiffies time_budget) {
+  while (TimeElapsed() < time_budget) {
+    if (!Step()) {
+      break;
+    }
+  }
 }
 
-const semantics::History& World::History() const {
-  return impl_->History();
-}
+void World::RestartServer(const std::string& hostname) {
+  WorldGuard g(this);
 
-std::vector<std::string> World::GetStdout(const std::string& hostname) const {
-  return impl_->GetStdout(hostname);
-}
-
-size_t World::StepCount() const {
-  return impl_->CurrentStep();
-}
-
-Jiffies World::TimeElapsed() const {
-  return impl_->TimeElapsed();
-}
-
-void World::SetGlobalImpl(const std::string& key, std::any value) {
-  impl_->SetGlobal(key, value);
-}
-
-std::any World::GetGlobalImpl(const std::string& key) const {
-  return impl_->GetGlobal(key);
+  FindServer(hostname)->FastReboot();
 }
 
 }  // namespace whirl::matrix

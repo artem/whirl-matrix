@@ -3,7 +3,7 @@
 #include <whirl/node/runtime/shortcuts.hpp>
 
 // Simulation
-#include <matrix/world/world.hpp>
+#include <matrix/facade/world.hpp>
 #include <matrix/test/event_log.hpp>
 
 using namespace whirl;
@@ -22,7 +22,7 @@ void HelloWorld() {
 int main() {
   static const size_t kSeed = 17;
 
-  matrix::World world{kSeed};
+  matrix::facade::World world{kSeed};
 
   static const std::string kHostName = "Julie";
 
