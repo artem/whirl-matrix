@@ -55,7 +55,7 @@ void ActivateAllocsTracker() {
   global_allocs_tracker.Activate();
 }
 
-void PrintTrackerReport() {
+void PrintAllocsTrackerReport() {
   global_allocs_tracker.PrintReport();
 }
 

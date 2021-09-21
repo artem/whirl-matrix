@@ -2,10 +2,11 @@
 
 #include <cstdlib>
 
+#include <matrix/test/simulation.hpp>
+#include <matrix/test/runner.hpp>
+
 namespace whirl::matrix {
 
-// Seed -> Digest
-typedef size_t (*Simulation)(size_t);
 
 int Main(int argc, const char** argv, Simulation sim);
 

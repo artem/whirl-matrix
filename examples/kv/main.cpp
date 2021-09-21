@@ -33,6 +33,7 @@
 #include <matrix/test/random.hpp>
 #include <matrix/test/main.hpp>
 #include <matrix/test/event_log.hpp>
+#include <matrix/test/runner.hpp>
 
 #include <matrix/fault/access.hpp>
 #include <matrix/fault/net/star.hpp>
@@ -371,17 +372,11 @@ using KVStoreModel = semantics::KVStoreModel<Key, Value>;
 
 //////////////////////////////////////////////////////////////////////
 
-void FailTest() {
-  std::cout << "(ﾉಥ益ಥ）ﾉ ┻━┻" << std::endl;
-  std::cout.flush();
-  std::exit(1);
-}
-
-//////////////////////////////////////////////////////////////////////
-
 // Seed -> simulation digest
 // Deterministic
 size_t RunSimulation(size_t seed) {
+  auto& runner = matrix::TestRunner::Access();
+
   static const size_t kTimeLimit = 10000;
   static const size_t kRequestsThreshold = 7;
 
@@ -392,9 +387,9 @@ size_t RunSimulation(size_t seed) {
   const size_t clients = random.Get(2, 3);
   const size_t keys = random.Get(1, 2);
 
-  std::cout << "Simulation seed: " << seed << std::endl;
+  runner.Debug() << "Simulation seed: " << seed << std::endl;
 
-  std::cout << "Parameters: "
+  runner.Debug() << "Parameters: "
             << "replicas = " << replicas << ", "
             << "clients = " << clients << ", "
             << "keys = " << keys << std::endl;
@@ -429,7 +424,7 @@ size_t RunSimulation(size_t seed) {
   size_t digest = world.Stop();
 
   // Print report
-  std::cout << "Seed " << seed << " -> "
+  runner.Debug() << "Seed " << seed << " -> "
             << "digest: " << digest << ", time: " << world.TimeElapsed()
             << ", steps: " << world.StepCount() << std::endl;
 
@@ -443,14 +438,14 @@ size_t RunSimulation(size_t seed) {
     std::cout << std::endl;
 
     if (world.TimeElapsed() < kTimeLimit) {
-      std::cout << "Deadlock in simulation" << std::endl;
+      runner.Out() << "Deadlock in simulation" << std::endl;
     } else {
-      std::cout << "Simulation time limit exceeded" << std::endl;
+      runner.Out() << "Simulation time limit exceeded" << std::endl;
     }
-    std::exit(1);
+    runner.Fail();
   }
 
-  std::cout << "Requests completed: " << world.GetCounter("requests")
+  runner.Debug() << "Requests completed: " << world.GetCounter("requests")
             << std::endl;
 
   // Check linearizability
@@ -459,16 +454,16 @@ size_t RunSimulation(size_t seed) {
 
   if (!linearizable) {
     // Log
-    std::cout << "Log:" << std::endl;
-    matrix::WriteTextLog(event_log, std::cout);
-    std::cout << std::endl;
+    runner.Debug() << "Log:" << std::endl;
+    matrix::WriteTextLog(event_log, runner.Debug());
+    runner.Debug() << std::endl;
 
     // History
-    std::cout << "History (seed = " << seed
-              << ") is NOT LINEARIZABLE:" << std::endl;
-    semantics::PrintKVHistory<Key, Value>(history, std::cout);
+    runner.Out() << "History is NOT LINEARIZABLE for seed = "
+      << seed << ":" << std::endl;
+    semantics::PrintKVHistory<Key, Value>(history, runner.Out());
 
-    FailTest();
+    runner.Fail();
   }
 
   return digest;

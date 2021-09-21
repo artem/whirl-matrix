@@ -84,4 +84,4 @@ make whirl_example_kv
 # Run kv example
 # --det - run determinism check
 # --sims - number of simulations to run
-./examples/kv/whirl_example_kv --det --sims 12345
+./examples/kv/whirl_example_kv --det --sims 12345 --verbose
