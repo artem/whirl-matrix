@@ -1,9 +1,9 @@
 #pragma once
 
-#include <whirl/node/guid/guid.hpp>
+#include <string>
 
 namespace whirl::matrix {
 
-node::Guid GenerateGuid();
+std::string GenerateGuid();
 
 }  // namespace whirl::matrix

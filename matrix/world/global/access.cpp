@@ -66,7 +66,7 @@ IActor* ThisActor() {
 
 //////////////////////////////////////////////////////////////////////
 
-node::Guid GenerateGuid() {
+std::string GenerateGuid() {
   return ThisWorld()->GenerateGuid();
 }
 

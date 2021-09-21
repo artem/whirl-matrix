@@ -13,8 +13,6 @@
 #include <matrix/helpers/digest.hpp>
 #include <matrix/helpers/untyped_dict.hpp>
 
-#include <whirl/node/guid/guid.hpp>
-
 #include <timber/logger.hpp>
 
 #include <wheels/support/id.hpp>
@@ -204,7 +202,7 @@ class World {
     return globals_.Get(name);
   }
 
-  node::Guid GenerateGuid() {
+  std::string GenerateGuid() {
     return fmt::format("guid-{}", guids_.NextId());
   }
 

@@ -1,15 +1,15 @@
 #pragma once
 
-#include <whirl/node/guid/guid.hpp>
+#include <whirl/node/guids/service.hpp>
 
 #include <matrix/world/global/guids.hpp>
 
 namespace whirl::matrix {
 
-struct GuidGenerator : public node::IGuidGenerator {
+struct GuidGenerator : public node::guids::IGuidGenerator {
   GuidGenerator() = default;
 
-  node::Guid Generate() override {
+  std::string Generate() override {
     return GenerateGuid();
   }
 };

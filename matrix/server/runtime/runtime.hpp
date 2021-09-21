@@ -87,7 +87,7 @@ struct NodeRuntime : node::IRuntime {
     return db.Get();
   }
 
-  node::IGuidGenerator* GuidGenerator() override {
+  node::guids::IGuidGenerator* GuidGenerator() override {
     return guids.Get();
   }
 
