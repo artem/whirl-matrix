@@ -90,7 +90,9 @@ void TestRunner::Fail() {
   std::exit(1);
 }
 
-void TestRunner::ResetLogFile(fs::path path) {
+void TestRunner::ResetLogFile() {
+  auto path = *log_path_;
+
   if (!fs::exists(path.parent_path())) {
     WHEELS_PANIC(
         "Log directory does not exist: " << path.parent_path());
@@ -100,11 +102,13 @@ void TestRunner::ResetLogFile(fs::path path) {
     fs::resize_file(path, 0);
   }
 
-  WriteLogHeader(path);
+  WriteLogHeader();
+
+  Out() << "Log file: " << path << std::endl;
 }
 
-void TestRunner::WriteLogHeader(const std::string& path) {
-  std::ofstream log(path);
+void TestRunner::WriteLogHeader() {
+  std::ofstream log(*log_path_);
   log << "Whirl simulator log" << std::endl;
   log.close();
 }

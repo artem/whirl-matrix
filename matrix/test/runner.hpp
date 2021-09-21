@@ -27,7 +27,7 @@ class TestRunner {
 
   void WriteLogTo(const std::string& path) {
     log_path_.emplace(path);
-    ResetLogFile(path);
+    ResetLogFile();
   }
 
   // Run
@@ -80,8 +80,8 @@ class TestRunner {
     sink_.swap(tmp);
   }
 
-  static void ResetLogFile(std::filesystem::path path);
-  static void WriteLogHeader(const std::string& path);
+  void ResetLogFile();
+  void WriteLogHeader();
 
  private:
   Simulation sim_;
