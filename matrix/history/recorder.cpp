@@ -4,9 +4,9 @@
 
 #include <matrix/new/new.hpp>
 
-using whirl::matrix::semantics::Arguments;
-using whirl::matrix::semantics::Call;
-using whirl::matrix::semantics::Value;
+using whirl::semantics::Arguments;
+using whirl::semantics::Call;
+using whirl::semantics::Value;
 
 namespace whirl::matrix {
 

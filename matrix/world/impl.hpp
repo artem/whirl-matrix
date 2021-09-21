@@ -1,6 +1,6 @@
 #pragma once
 
-#include <matrix/world/time.hpp>
+#include <matrix/time/time.hpp>
 #include <matrix/server/server.hpp>
 #include <matrix/network/network.hpp>
 #include <matrix/world/actor.hpp>

@@ -4,8 +4,8 @@
 
 #include <cstdint>
 
-namespace whirl {
+namespace whirl::matrix {
 
 using TimePoint = uint64_t;
 
-}  // namespace whirl
+}  // namespace whirl::matrix

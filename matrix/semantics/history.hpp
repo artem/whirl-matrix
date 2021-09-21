@@ -1,7 +1,5 @@
 #pragma once
 
-#include <matrix/time/time_point.hpp>
-
 #include <muesli/serialize.hpp>
 #include <muesli/tuple.hpp>
 
@@ -13,7 +11,11 @@
 #include <vector>
 #include <optional>
 
-namespace whirl::matrix::semantics {
+namespace whirl::semantics {
+
+//////////////////////////////////////////////////////////////////////
+
+using TimePoint = uint64_t;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -95,4 +97,4 @@ using History = std::vector<Call>;
 
 //////////////////////////////////////////////////////////////////////
 
-}  // namespace whirl::matrix::semantics
+}  // namespace whirl::semantics

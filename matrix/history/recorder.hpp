@@ -11,7 +11,7 @@ class HistoryRecorder {
   struct RunningCall {
     std::string method;
     semantics::Arguments arguments;
-    TimePoint start_time;
+    semantics::TimePoint start_time;
     semantics::CallLabels labels;
   };
 

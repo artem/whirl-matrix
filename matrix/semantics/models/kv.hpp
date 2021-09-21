@@ -6,7 +6,7 @@
 
 #include <map>
 
-namespace whirl::matrix::semantics {
+namespace whirl::semantics {
 
 //////////////////////////////////////////////////////////////////////
 
@@ -131,4 +131,4 @@ class KVStoreModel {
   }
 };
 
-}  // namespace whirl::matrix::semantics
+}  // namespace whirl::semantics

@@ -367,7 +367,7 @@ const std::string& ChooseRandomKey() {
 
 // Sequential specification for KV storage
 // Used by linearizability checker
-using KVStoreModel = matrix::semantics::KVStoreModel<Key, Value>;
+using KVStoreModel = semantics::KVStoreModel<Key, Value>;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -455,7 +455,7 @@ size_t RunSimulation(size_t seed) {
 
   // Check linearizability
   const auto history = world.History();
-  const bool linearizable = matrix::semantics::LinCheck<KVStoreModel>(history);
+  const bool linearizable = semantics::LinCheck<KVStoreModel>(history);
 
   if (!linearizable) {
     // Log
@@ -466,7 +466,7 @@ size_t RunSimulation(size_t seed) {
     // History
     std::cout << "History (seed = " << seed
               << ") is NOT LINEARIZABLE:" << std::endl;
-    matrix::semantics::PrintKVHistory<Key, Value>(history, std::cout);
+    semantics::PrintKVHistory<Key, Value>(history, std::cout);
 
     FailTest();
   }
