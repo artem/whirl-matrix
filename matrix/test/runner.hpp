@@ -60,13 +60,6 @@ class TestRunner {
     return std::cout;
   }
 
-  void PrintLog(log::EventLog event_log) {
-    // Print always
-    std::cout << "Log:" << std::endl;
-    matrix::WriteTextLog(event_log, std::cout);
-    std::cout << std::endl;
-  }
-
   // Fail
 
   void Fail();
