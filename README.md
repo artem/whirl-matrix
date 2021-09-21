@@ -1,6 +1,6 @@
 # Whirl-Matrix
 
-Distributed system deterministic simulator
+Deterministic simulator for [Whirl](https://gitlab.com/Lipovsky/whirl)
 
 ## Example
 
