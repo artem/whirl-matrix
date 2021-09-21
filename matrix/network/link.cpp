@@ -1,10 +1,10 @@
-#include <whirl/engines/matrix/network/link.hpp>
+#include <matrix/network/link.hpp>
 
-#include <whirl/engines/matrix/network/network.hpp>
+#include <matrix/network/network.hpp>
 
-#include <whirl/engines/matrix/world/global/time.hpp>
-#include <whirl/engines/matrix/world/global/time_model.hpp>
-#include <whirl/engines/matrix/world/global/log.hpp>
+#include <matrix/world/global/time.hpp>
+#include <matrix/world/global/time_model.hpp>
+#include <matrix/world/global/log.hpp>
 
 #include <timber/log.hpp>
 

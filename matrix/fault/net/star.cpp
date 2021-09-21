@@ -1,8 +1,8 @@
-#include <whirl/engines/matrix/fault/net/star.hpp>
+#include <matrix/fault/net/star.hpp>
 
 #include <whirl/node/runtime/shortcuts.hpp>
 
-#include <whirl/engines/matrix/fault/access.hpp>
+#include <matrix/fault/access.hpp>
 
 namespace whirl::matrix::fault {
 

@@ -1,17 +1,17 @@
 #pragma once
 
-#include <whirl/engines/matrix/world/time.hpp>
-#include <whirl/engines/matrix/server/server.hpp>
-#include <whirl/engines/matrix/network/network.hpp>
-#include <whirl/engines/matrix/world/actor.hpp>
-#include <whirl/engines/matrix/world/actor_ctx.hpp>
-#include <whirl/engines/matrix/world/random_source.hpp>
-#include <whirl/engines/matrix/world/time_model.hpp>
-#include <whirl/engines/matrix/history/recorder.hpp>
-#include <whirl/engines/matrix/log/backend.hpp>
+#include <matrix/world/time.hpp>
+#include <matrix/server/server.hpp>
+#include <matrix/network/network.hpp>
+#include <matrix/world/actor.hpp>
+#include <matrix/world/actor_ctx.hpp>
+#include <matrix/world/random_source.hpp>
+#include <matrix/world/time_model.hpp>
+#include <matrix/history/recorder.hpp>
+#include <matrix/log/backend.hpp>
 
-#include <whirl/engines/matrix/helpers/digest.hpp>
-#include <whirl/engines/matrix/helpers/untyped_dict.hpp>
+#include <matrix/helpers/digest.hpp>
+#include <matrix/helpers/untyped_dict.hpp>
 
 #include <whirl/node/guid/guid.hpp>
 

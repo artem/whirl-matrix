@@ -1,7 +1,7 @@
 #pragma once
 
-#include <whirl/engines/matrix/network/packet.hpp>
-#include <whirl/engines/matrix/network/zone.hpp>
+#include <matrix/network/packet.hpp>
+#include <matrix/network/zone.hpp>
 
 #include <string>
 

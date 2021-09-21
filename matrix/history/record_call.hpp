@@ -1,6 +1,6 @@
 #pragma once
 
-#include <whirl/engines/matrix/world/global/global.hpp>
+#include <matrix/world/global/global.hpp>
 
 #include <whirl/cereal/serialize.hpp>
 #include <whirl/cereal/tuple.hpp>

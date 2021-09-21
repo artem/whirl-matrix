@@ -2,7 +2,7 @@
 
 #include <commute/transport/transport.hpp>
 
-#include <whirl/engines/matrix/network/transport.hpp>
+#include <matrix/network/transport.hpp>
 
 #include <tuple>
 

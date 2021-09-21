@@ -1,8 +1,8 @@
 #pragma once
 
-#include <whirl/engines/matrix/network/address.hpp>
-#include <whirl/engines/matrix/network/message.hpp>
-#include <whirl/engines/matrix/network/timestamp.hpp>
+#include <matrix/network/address.hpp>
+#include <matrix/network/message.hpp>
+#include <matrix/network/timestamp.hpp>
 
 namespace whirl::matrix::net {
 

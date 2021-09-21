@@ -1,4 +1,4 @@
-#include <whirl/engines/matrix/log/format.hpp>
+#include <matrix/log/format.hpp>
 
 #include <timber/level/string.hpp>
 

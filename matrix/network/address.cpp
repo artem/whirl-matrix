@@ -1,4 +1,4 @@
-#include <whirl/engines/matrix/network/address.hpp>
+#include <matrix/network/address.hpp>
 
 namespace whirl::matrix::net {
 

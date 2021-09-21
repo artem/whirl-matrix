@@ -2,9 +2,9 @@
 
 #include <whirl/node/misc/terminal.hpp>
 
-#include <whirl/engines/matrix/server/stdout.hpp>
+#include <matrix/server/stdout.hpp>
 
-#include <whirl/engines/matrix/world/global/log.hpp>
+#include <matrix/world/global/log.hpp>
 
 #include <timber/log.hpp>
 

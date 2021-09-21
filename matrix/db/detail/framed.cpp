@@ -1,4 +1,4 @@
-#include <whirl/engines/matrix/db/detail/framed.hpp>
+#include <matrix/db/detail/framed.hpp>
 
 #include <wheels/io/read.hpp>
 #include <wheels/io/write.hpp>

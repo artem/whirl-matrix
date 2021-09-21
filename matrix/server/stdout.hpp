@@ -1,6 +1,6 @@
 #pragma once
 
-#include <whirl/engines/matrix/new/new.hpp>
+#include <matrix/new/new.hpp>
 
 namespace whirl::matrix {
 

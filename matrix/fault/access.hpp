@@ -1,7 +1,7 @@
 #pragma once
 
-#include <whirl/engines/matrix/fault/server.hpp>
-#include <whirl/engines/matrix/fault/network.hpp>
+#include <matrix/fault/server.hpp>
+#include <matrix/fault/network.hpp>
 
 namespace whirl::matrix::fault {
 

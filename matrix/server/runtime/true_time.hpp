@@ -2,8 +2,8 @@
 
 #include <whirl/node/time/true_time_service.hpp>
 
-#include <whirl/engines/matrix/world/global/time.hpp>
-#include <whirl/engines/matrix/world/global/time_model.hpp>
+#include <matrix/world/global/time.hpp>
+#include <matrix/world/global/time_model.hpp>
 
 namespace whirl::matrix {
 

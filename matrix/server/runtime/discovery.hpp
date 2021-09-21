@@ -2,7 +2,7 @@
 
 #include <whirl/node/cluster/discovery.hpp>
 
-#include <whirl/engines/matrix/world/global/global.hpp>
+#include <matrix/world/global/global.hpp>
 
 namespace whirl::matrix {
 

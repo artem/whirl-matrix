@@ -1,4 +1,4 @@
-#include <whirl/engines/matrix/memory/heap.hpp>
+#include <matrix/memory/heap.hpp>
 
 #include <wheels/support/assert.hpp>
 

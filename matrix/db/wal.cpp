@@ -1,4 +1,4 @@
-#include <whirl/engines/matrix/db/wal.hpp>
+#include <matrix/db/wal.hpp>
 
 using whirl::node::db::WriteBatch;
 

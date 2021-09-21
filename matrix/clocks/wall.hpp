@@ -2,8 +2,8 @@
 
 #include <whirl/node/time/wall_time.hpp>
 
-#include <whirl/engines/matrix/world/global/time.hpp>
-#include <whirl/engines/matrix/world/global/time_model.hpp>
+#include <matrix/world/global/time.hpp>
+#include <matrix/world/global/time_model.hpp>
 
 namespace whirl::matrix::clocks {
 

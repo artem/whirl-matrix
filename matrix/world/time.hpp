@@ -1,6 +1,6 @@
 #pragma once
 
-#include <whirl/time.hpp>
+#include <matrix/time/time_point.hpp>
 
 #include <wheels/support/assert.hpp>
 

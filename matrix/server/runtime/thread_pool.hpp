@@ -1,7 +1,7 @@
 #pragma once
 
-#include <whirl/engines/matrix/process/scheduler.hpp>
-#include <whirl/engines/matrix/world/global/time.hpp>
+#include <matrix/process/scheduler.hpp>
+#include <matrix/world/global/time.hpp>
 
 #include <await/executors/executor.hpp>
 

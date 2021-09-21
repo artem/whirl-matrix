@@ -1,6 +1,6 @@
 #pragma once
 
-#include <whirl/engines/matrix/log/event.hpp>
+#include <matrix/log/event.hpp>
 
 #include <iostream>
 

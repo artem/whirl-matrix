@@ -2,7 +2,7 @@
 
 #include <whirl/node/time/time_service.hpp>
 
-#include <whirl/engines/matrix/world/global/time_model.hpp>
+#include <matrix/world/global/time_model.hpp>
 
 #include <await/fibers/core/await.hpp>
 #include <await/fibers/sync/future.hpp>

@@ -3,8 +3,8 @@
 #include <whirl/node/fs/fs.hpp>
 #include <whirl/node/time/time_service.hpp>
 
-#include <whirl/engines/matrix/server/runtime/detail/disk.hpp>
-#include <whirl/engines/matrix/fs/fs.hpp>
+#include <matrix/server/runtime/detail/disk.hpp>
+#include <matrix/fs/fs.hpp>
 
 namespace whirl::matrix {
 

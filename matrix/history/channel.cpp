@@ -1,10 +1,10 @@
-#include <whirl/engines/matrix/history/channel.hpp>
+#include <matrix/history/channel.hpp>
 
 #include <commute/rpc/channel.hpp>
 #include <commute/rpc/errors.hpp>
 #include <commute/rpc/trace.hpp>
 
-#include <whirl/engines/matrix/world/global/global.hpp>
+#include <matrix/world/global/global.hpp>
 
 #include <await/futures/core/future.hpp>
 #include <await/futures/helpers.hpp>

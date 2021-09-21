@@ -1,12 +1,12 @@
-#include <whirl/engines/matrix/network/transport.hpp>
+#include <matrix/network/transport.hpp>
 
-#include <whirl/engines/matrix/network/network.hpp>
+#include <matrix/network/network.hpp>
 
-#include <whirl/engines/matrix/new/new.hpp>
+#include <matrix/new/new.hpp>
 
 // IsThereAdversary
-#include <whirl/engines/matrix/world/global/global.hpp>
-#include <whirl/engines/matrix/world/global/log.hpp>
+#include <matrix/world/global/global.hpp>
+#include <matrix/world/global/log.hpp>
 
 #include <timber/log.hpp>
 

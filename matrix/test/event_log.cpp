@@ -1,6 +1,6 @@
-#include <whirl/engines/matrix/test/event_log.hpp>
+#include <matrix/test/event_log.hpp>
 
-#include <whirl/engines/matrix/log/format.hpp>
+#include <matrix/log/format.hpp>
 
 namespace whirl::matrix {
 

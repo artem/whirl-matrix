@@ -1,8 +1,8 @@
 #pragma once
 
-#include <whirl/engines/matrix/log/event.hpp>
-#include <whirl/engines/matrix/log/env.hpp>
-#include <whirl/engines/matrix/log/file.hpp>
+#include <matrix/log/event.hpp>
+#include <matrix/log/env.hpp>
+#include <matrix/log/file.hpp>
 
 #include <timber/backend.hpp>
 

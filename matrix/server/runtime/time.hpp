@@ -2,9 +2,9 @@
 
 #include <whirl/node/time/time_service.hpp>
 
-#include <whirl/engines/matrix/clocks/wall.hpp>
-#include <whirl/engines/matrix/clocks/monotonic.hpp>
-#include <whirl/engines/matrix/process/scheduler.hpp>
+#include <matrix/clocks/wall.hpp>
+#include <matrix/clocks/monotonic.hpp>
+#include <matrix/process/scheduler.hpp>
 
 #include <await/futures/core/future.hpp>
 

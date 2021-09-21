@@ -1,6 +1,6 @@
-#include <whirl/engines/matrix/world/time_models/crazy.hpp>
+#include <matrix/world/time_models/crazy.hpp>
 
-#include <whirl/engines/matrix/world/global/random.hpp>
+#include <matrix/world/global/random.hpp>
 
 namespace whirl::matrix {
 

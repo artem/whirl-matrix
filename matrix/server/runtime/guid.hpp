@@ -2,7 +2,7 @@
 
 #include <whirl/node/guid/guid.hpp>
 
-#include <whirl/engines/matrix/world/global/guids.hpp>
+#include <matrix/world/global/guids.hpp>
 
 namespace whirl::matrix {
 

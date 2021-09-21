@@ -1,12 +1,12 @@
 #pragma once
 
-#include <whirl/engines/matrix/network/address.hpp>
-#include <whirl/engines/matrix/network/packet.hpp>
-#include <whirl/engines/matrix/network/timestamp.hpp>
-#include <whirl/engines/matrix/network/socket.hpp>
+#include <matrix/network/address.hpp>
+#include <matrix/network/packet.hpp>
+#include <matrix/network/timestamp.hpp>
+#include <matrix/network/socket.hpp>
 
-#include <whirl/engines/matrix/process/memory.hpp>
-#include <whirl/engines/matrix/process/scheduler.hpp>
+#include <matrix/process/memory.hpp>
+#include <matrix/process/scheduler.hpp>
 
 #include <timber/logger.hpp>
 

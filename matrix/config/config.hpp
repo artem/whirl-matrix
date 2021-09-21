@@ -2,9 +2,9 @@
 
 #include <whirl/node/config/config.hpp>
 
-#include <whirl/engines/matrix/config/server.hpp>
+#include <matrix/config/server.hpp>
 
-#include <whirl/engines/matrix/world/global/time_model.hpp>
+#include <matrix/world/global/time_model.hpp>
 
 namespace whirl::matrix::cfg {
 

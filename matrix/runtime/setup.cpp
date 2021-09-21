@@ -1,6 +1,6 @@
-#include <whirl/engines/matrix/runtime/setup.hpp>
+#include <matrix/runtime/setup.hpp>
 
-#include <whirl/engines/matrix/server/server.hpp>
+#include <matrix/server/server.hpp>
 
 #include <whirl/runtime/access.hpp>
 

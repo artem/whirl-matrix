@@ -1,4 +1,4 @@
-#include <whirl/engines/matrix/process/trampoline.hpp>
+#include <matrix/process/trampoline.hpp>
 
 #include <whirl/node/runtime/shortcuts.hpp>
 

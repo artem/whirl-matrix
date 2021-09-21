@@ -1,9 +1,9 @@
-#include <whirl/engines/matrix/network/socket.hpp>
+#include <matrix/network/socket.hpp>
 
-#include <whirl/engines/matrix/network/link.hpp>
-#include <whirl/engines/matrix/network/transport.hpp>
+#include <matrix/network/link.hpp>
+#include <matrix/network/transport.hpp>
 
-#include <whirl/engines/matrix/new/new.hpp>
+#include <matrix/new/new.hpp>
 
 namespace whirl::matrix::net {
 

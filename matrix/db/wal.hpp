@@ -5,7 +5,7 @@
 #include <whirl/node/fs/fs.hpp>
 #include <whirl/node/fs/io.hpp>
 
-#include <whirl/engines/matrix/db/detail/framed.hpp>
+#include <matrix/db/detail/framed.hpp>
 
 #include <muesli/serialize.hpp>
 #include <muesli/serializable.hpp>

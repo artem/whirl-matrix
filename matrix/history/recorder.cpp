@@ -1,8 +1,8 @@
-#include <whirl/engines/matrix/history/recorder.hpp>
+#include <matrix/history/recorder.hpp>
 
-#include <whirl/engines/matrix/world/global/global.hpp>
+#include <matrix/world/global/global.hpp>
 
-#include <whirl/engines/matrix/new/new.hpp>
+#include <matrix/new/new.hpp>
 
 using whirl::histories::Arguments;
 using whirl::histories::Call;

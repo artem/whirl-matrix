@@ -1,13 +1,13 @@
-#include <whirl/engines/matrix/server/server.hpp>
+#include <matrix/server/server.hpp>
 
-#include <whirl/engines/matrix/world/global/actor.hpp>
-#include <whirl/engines/matrix/world/global/log.hpp>
+#include <matrix/world/global/actor.hpp>
+#include <matrix/world/global/log.hpp>
 
-#include <whirl/engines/matrix/process/trampoline.hpp>
+#include <matrix/process/trampoline.hpp>
 
-#include <whirl/engines/matrix/server/runtime/runtime.hpp>
+#include <matrix/server/runtime/runtime.hpp>
 
-#include <whirl/engines/matrix/helpers/digest.hpp>
+#include <matrix/helpers/digest.hpp>
 
 #include <timber/log.hpp>
 

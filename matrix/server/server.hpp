@@ -3,24 +3,24 @@
 #include <whirl/runtime/runtime.hpp>
 #include <whirl/node/program/main.hpp>
 
-#include <whirl/engines/matrix/world/actor.hpp>
-#include <whirl/engines/matrix/fault/server.hpp>
+#include <matrix/world/actor.hpp>
+#include <matrix/fault/server.hpp>
 
-#include <whirl/engines/matrix/config/server.hpp>
+#include <matrix/config/server.hpp>
 
-#include <whirl/engines/matrix/server/stdout.hpp>
+#include <matrix/server/stdout.hpp>
 
-#include <whirl/engines/matrix/clocks/monotonic.hpp>
-#include <whirl/engines/matrix/clocks/wall.hpp>
+#include <matrix/clocks/monotonic.hpp>
+#include <matrix/clocks/wall.hpp>
 
-#include <whirl/engines/matrix/fs/fs.hpp>
+#include <matrix/fs/fs.hpp>
 
-#include <whirl/engines/matrix/network/server.hpp>
-#include <whirl/engines/matrix/network/network.hpp>
-#include <whirl/engines/matrix/network/transport.hpp>
+#include <matrix/network/server.hpp>
+#include <matrix/network/network.hpp>
+#include <matrix/network/transport.hpp>
 
-#include <whirl/engines/matrix/process/memory.hpp>
-#include <whirl/engines/matrix/process/scheduler.hpp>
+#include <matrix/process/memory.hpp>
+#include <matrix/process/scheduler.hpp>
 
 #include <timber/logger.hpp>
 

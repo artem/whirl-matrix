@@ -1,6 +1,6 @@
 #pragma once
 
-#include <whirl/engines/matrix/world/actor.hpp>
+#include <matrix/world/actor.hpp>
 
 namespace whirl::matrix {
 

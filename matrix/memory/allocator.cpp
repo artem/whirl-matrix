@@ -1,7 +1,7 @@
-#include <whirl/engines/matrix/memory/allocator.hpp>
+#include <matrix/memory/allocator.hpp>
 
-#include <whirl/engines/matrix/new/new.hpp>
-#include <whirl/engines/matrix/memory/heap.hpp>
+#include <matrix/new/new.hpp>
+#include <matrix/memory/heap.hpp>
 
 #include <wheels/support/assert.hpp>
 

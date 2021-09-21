@@ -1,6 +1,6 @@
-#include <whirl/engines/matrix/world/world.hpp>
+#include <matrix/world/world.hpp>
 
-#include <whirl/engines/matrix/world/impl.hpp>
+#include <matrix/world/impl.hpp>
 
 namespace whirl::matrix {
 

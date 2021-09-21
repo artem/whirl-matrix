@@ -1,12 +1,12 @@
 #pragma once
 
-#include <whirl/engines/matrix/world/actor.hpp>
-#include <whirl/engines/matrix/fault/network.hpp>
+#include <matrix/world/actor.hpp>
+#include <matrix/fault/network.hpp>
 
-#include <whirl/engines/matrix/network/link.hpp>
-#include <whirl/engines/matrix/network/server.hpp>
+#include <matrix/network/link.hpp>
+#include <matrix/network/server.hpp>
 
-#include <whirl/engines/matrix/helpers/digest.hpp>
+#include <matrix/helpers/digest.hpp>
 
 #include <timber/logger.hpp>
 

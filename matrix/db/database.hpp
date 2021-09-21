@@ -5,8 +5,8 @@
 
 #include <whirl/node/fs/fs.hpp>
 
-#include <whirl/engines/matrix/db/mem_table.hpp>
-#include <whirl/engines/matrix/db/wal.hpp>
+#include <matrix/db/mem_table.hpp>
+#include <matrix/db/wal.hpp>
 
 #include <timber/logger.hpp>
 

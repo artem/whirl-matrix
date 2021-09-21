@@ -1,14 +1,14 @@
 #pragma once
 
-#include <whirl/engines/matrix/world/global/actor.hpp>
-#include <whirl/engines/matrix/world/global/random.hpp>
-#include <whirl/engines/matrix/world/global/time.hpp>
-#include <whirl/engines/matrix/world/global/vars.hpp>
-#include <whirl/engines/matrix/world/global/guids.hpp>
+#include <matrix/world/global/actor.hpp>
+#include <matrix/world/global/random.hpp>
+#include <matrix/world/global/time.hpp>
+#include <matrix/world/global/vars.hpp>
+#include <matrix/world/global/guids.hpp>
 
-#include <whirl/engines/matrix/world/time_model.hpp>
-#include <whirl/engines/matrix/history/recorder.hpp>
-#include <whirl/engines/matrix/log/backend.hpp>
+#include <matrix/world/time_model.hpp>
+#include <matrix/history/recorder.hpp>
+#include <matrix/log/backend.hpp>
 
 #include <cstdlib>
 #include <vector>

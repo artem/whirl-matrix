@@ -1,6 +1,6 @@
-#include <whirl/engines/matrix/fault/access.hpp>
+#include <matrix/fault/access.hpp>
 
-#include <whirl/engines/matrix/world/impl.hpp>
+#include <matrix/world/impl.hpp>
 
 namespace whirl::matrix::fault {
 

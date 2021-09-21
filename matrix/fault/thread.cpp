@@ -1,7 +1,7 @@
-#include <whirl/engines/matrix/fault/thread.hpp>
+#include <matrix/fault/thread.hpp>
 
-#include <whirl/engines/matrix/server/server.hpp>
-#include <whirl/engines/matrix/world/global/time_model.hpp>
+#include <matrix/server/server.hpp>
+#include <matrix/world/global/time_model.hpp>
 
 #include <await/fibers/core/api.hpp>
 #include <await/fibers/core/await.hpp>

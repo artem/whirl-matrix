@@ -1,4 +1,4 @@
-#include <whirl/engines/matrix/client/util.hpp>
+#include <matrix/client/util.hpp>
 
 #include <whirl/node/runtime/shortcuts.hpp>
 

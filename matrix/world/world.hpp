@@ -1,8 +1,8 @@
 #pragma once
 
-#include <whirl/engines/matrix/world/time_model.hpp>
-#include <whirl/engines/matrix/log/event.hpp>
-#include <whirl/history/history.hpp>
+#include <matrix/world/time_model.hpp>
+#include <matrix/log/event.hpp>
+#include <matrix/semantics/history.hpp>
 #include <whirl/node/program/main.hpp>
 
 #include <memory>

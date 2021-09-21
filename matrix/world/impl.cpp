@@ -1,8 +1,8 @@
-#include <whirl/engines/matrix/world/impl.hpp>
+#include <matrix/world/impl.hpp>
 
-#include <whirl/engines/matrix/world/time_models/crazy.hpp>
+#include <matrix/world/time_models/crazy.hpp>
 
-#include <whirl/engines/matrix/runtime/setup.hpp>
+#include <matrix/runtime/setup.hpp>
 
 #include <timber/log.hpp>
 

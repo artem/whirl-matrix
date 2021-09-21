@@ -1,8 +1,8 @@
-#include <whirl/engines/matrix/log/backend.hpp>
+#include <matrix/log/backend.hpp>
 
-#include <whirl/engines/matrix/log/format.hpp>
+#include <matrix/log/format.hpp>
 
-#include <whirl/engines/matrix/new/new.hpp>
+#include <matrix/new/new.hpp>
 
 #include <iostream>
 

@@ -4,22 +4,22 @@
 
 // Runtime impl
 
-#include <whirl/engines/matrix/server/runtime/random.hpp>
-#include <whirl/engines/matrix/server/runtime/thread_pool.hpp>
-#include <whirl/engines/matrix/server/runtime/time.hpp>
-#include <whirl/engines/matrix/server/runtime/filesystem.hpp>
-#include <whirl/engines/matrix/server/runtime/true_time.hpp>
-#include <whirl/engines/matrix/server/runtime/guid.hpp>
-#include <whirl/engines/matrix/server/runtime/net_transport.hpp>
-#include <whirl/engines/matrix/server/runtime/database.hpp>
-#include <whirl/engines/matrix/server/runtime/discovery.hpp>
-#include <whirl/engines/matrix/server/runtime/terminal.hpp>
+#include <matrix/server/runtime/random.hpp>
+#include <matrix/server/runtime/thread_pool.hpp>
+#include <matrix/server/runtime/time.hpp>
+#include <matrix/server/runtime/filesystem.hpp>
+#include <matrix/server/runtime/true_time.hpp>
+#include <matrix/server/runtime/guid.hpp>
+#include <matrix/server/runtime/net_transport.hpp>
+#include <matrix/server/runtime/database.hpp>
+#include <matrix/server/runtime/discovery.hpp>
+#include <matrix/server/runtime/terminal.hpp>
 
-#include <whirl/engines/matrix/process/fibers.hpp>
+#include <matrix/process/fibers.hpp>
 
-#include <whirl/engines/matrix/world/global/log.hpp>
+#include <matrix/world/global/log.hpp>
 
-#include <whirl/engines/matrix/config/config.hpp>
+#include <matrix/config/config.hpp>
 
 #include <optional>
 

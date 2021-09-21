@@ -1,6 +1,6 @@
-#include <whirl/engines/matrix/log/event.hpp>
+#include <matrix/log/event.hpp>
 
-#include <whirl/engines/matrix/world/global/global.hpp>
+#include <matrix/world/global/global.hpp>
 
 #include <commute/rpc/trace.hpp>
 

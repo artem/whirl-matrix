@@ -1,7 +1,7 @@
-#include <whirl/engines/matrix/db/database.hpp>
+#include <matrix/db/database.hpp>
 
-#include <whirl/engines/matrix/world/global/random.hpp>
-#include <whirl/engines/matrix/world/global/log.hpp>
+#include <matrix/world/global/random.hpp>
+#include <matrix/world/global/log.hpp>
 
 #include <timber/log.hpp>
 
