@@ -92,8 +92,9 @@ class TestRunner {
   Simulation sim_;
 
   bool verbose_{false};
-  std::stringstream sink_;
   std::optional<std::string> log_file_;
+
+  std::stringstream sink_;
 };
 
 }  // namespace whirl::matrix
