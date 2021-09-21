@@ -6,6 +6,8 @@
 #include <matrix/world/global/time_model.hpp>
 #include <matrix/world/global/log.hpp>
 
+#include <matrix/log/bytes.hpp>
+
 #include <timber/log.hpp>
 
 #include <wheels/support/assert.hpp>
@@ -19,7 +21,7 @@ Link::Link(Network* net, IServer* start, IServer* end)
 void Link::Add(Packet packet) {
   if (packet.header.type == Packet::Type::Data) {
     Address to{End()->HostName(), packet.header.dest_port};
-    LOG_INFO("Send packet to {}: <{}>", to, packet.message);
+    LOG_INFO("Send packet to {}: {}", to, log::FormatMessage(packet.message));
   }
   Add(std::move(packet), ChooseDeliveryTime(packet));
 }

@@ -3,6 +3,8 @@
 #include <matrix/world/global/random.hpp>
 #include <matrix/world/global/log.hpp>
 
+#include <matrix/log/bytes.hpp>
+
 #include <timber/log.hpp>
 
 using whirl::node::db::Key;
@@ -22,7 +24,7 @@ void Database::Open(const std::string& directory) {
 }
 
 void Database::Put(const Key& key, const Value& value) {
-  LOG_INFO("Put('{}', '{}')", key, value);
+  LOG_INFO("Put('{}', '{}')", key, log::FormatMessage(value));
 
   node::db::WriteBatch batch;
   batch.Put(key, value);
@@ -62,7 +64,7 @@ void Database::ApplyToMemTable(const node::db::WriteBatch& batch) {
   for (const auto& mut : batch.muts) {
     switch (mut.type) {
       case node::db::MutationType::Put:
-        LOG_INFO("Put('{}', '{}')", mut.key, *mut.value);
+        LOG_INFO("Put('{}', '{}')", mut.key, log::FormatMessage(*mut.value));
         mem_table_.Put(mut.key, *mut.value);
         break;
       case node::db::MutationType::Delete:
