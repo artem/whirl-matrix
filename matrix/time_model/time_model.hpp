@@ -29,7 +29,7 @@ struct IServerTimeModel {
 
   // Wall clock
 
-  virtual TimePoint InitWallClockOffset() = 0;
+  virtual Jiffies InitWallClockOffset() = 0;
 
   // TrueTime
 

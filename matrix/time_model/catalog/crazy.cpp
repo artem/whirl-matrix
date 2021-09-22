@@ -30,7 +30,7 @@ class CrazyServerTimeModel : public IServerTimeModel {
     return GlobalRandomNumber(1, 100);
   }
 
-  TimePoint InitWallClockOffset() override {
+  Jiffies InitWallClockOffset() override {
     return GlobalRandomNumber(1000);
   }
 

@@ -18,7 +18,7 @@ class AdversaryTimeModel : public IServerTimeModel {
     return 0;
   }
 
-  TimePoint InitWallClockOffset() override {
+  Jiffies InitWallClockOffset() override {
     return 0;
   }
 
