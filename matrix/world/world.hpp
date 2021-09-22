@@ -1,6 +1,7 @@
 #pragma once
 
 #include <matrix/time/time.hpp>
+#include <matrix/guids/generator.hpp>
 #include <matrix/server/server.hpp>
 #include <matrix/network/network.hpp>
 #include <matrix/world/actor.hpp>
@@ -206,8 +207,9 @@ class World {
     return globals_.Get(name);
   }
 
+  // Context: Server!
   std::string GenerateGuid() {
-    return fmt::format("guid-{}", guids_.NextId());
+    return guids_.GenerateNext();
   }
 
  private:
@@ -278,7 +280,7 @@ class World {
 
   Time time_;
   RandomSource random_source_;
-  wheels::IdGenerator guids_;
+  guids::GuidGenerator guids_;
 
   ITimeModelPtr time_model_;
 
