@@ -1,11 +1,8 @@
 #include "node/main.hpp"
+#include "client/client.hpp"
 
 // Node
-#include <whirl/node/program/prologue.hpp>
 #include <whirl/node/runtime/shortcuts.hpp>
-
-// RPC
-#include <commute/rpc/call.hpp>
 
 // Serialization
 #include <muesli/serializable.hpp>
@@ -22,7 +19,7 @@
 // Simulation
 #include <matrix/facade/world.hpp>
 #include <matrix/world/global/vars.hpp>
-#include <matrix/client/main.hpp>
+#include <matrix/world/global/time.hpp>
 #include <matrix/client/rpc.hpp>
 #include <matrix/client/util.hpp>
 #include <matrix/test/random.hpp>
@@ -30,8 +27,11 @@
 #include <matrix/test/event_log.hpp>
 #include <matrix/test/runner.hpp>
 
+#include <matrix/time_model/catalog/crazy.hpp>
+
 #include <matrix/fault/access.hpp>
 #include <matrix/fault/net/star.hpp>
+#include <matrix/fault/util.hpp>
 
 #include <matrix/semantics/printers/kv.hpp>
 #include <matrix/semantics/checker/check.hpp>
@@ -41,52 +41,7 @@
 
 #include <algorithm>
 
-using await::futures::Future;
-using await::fibers::Await;
-using wheels::Result;
-
 using namespace whirl;
-
-//////////////////////////////////////////////////////////////////////
-
-using Key = std::string;
-using Value = uint32_t;
-
-//////////////////////////////////////////////////////////////////////
-
-class KVBlockingStub {
- public:
-  KVBlockingStub(commute::rpc::IChannelPtr channel) : channel_(channel) {
-  }
-
-  void Set(Key key, Value value) {
-    Await(commute::rpc::Call("KV.Set")  //
-              .Args(key, value)
-              .Via(channel_)
-              .TraceWith(GenerateTraceId("Set"))
-              .Start()
-              .As<void>())
-        .ThrowIfError();
-  }
-
-  Value Get(Key key) {
-    return Await(commute::rpc::Call("KV.Get")  //
-                     .Args(key)
-                     .Via(channel_)
-                     .TraceWith(GenerateTraceId("Get"))
-                     .Start()
-                     .As<Value>())
-        .ValueOrThrow();
-  }
-
- private:
-  std::string GenerateTraceId(std::string cmd) const {
-    return fmt::format("{}-{}", cmd, node::rt::GenerateGuid());
-  }
-
- private:
-  commute::rpc::IChannelPtr channel_;
-};
 
 //////////////////////////////////////////////////////////////////////
 
@@ -99,11 +54,16 @@ const std::string& ChooseRandomKey() {
 //////////////////////////////////////////////////////////////////////
 
 [[noreturn]] void Client() {
-  matrix::client::Prologue();
+  await::fibers::self::SetName("main");
+
+  node::rt::SleepFor(123_jfs);
+
+  // + Random delay
+  node::rt::SleepFor({node::rt::RandomNumber(50, 100)});
 
   timber::Logger logger_{"Client", node::rt::LoggerBackend()};
 
-  KVBlockingStub kv_store{matrix::client::MakeRpcChannel(
+  KVBlockingClient kv_store{matrix::client::MakeRpcChannel(
       /*pool_name=*/"kv", /*port=*/42)};
 
   for (size_t i = 1;; ++i) {
@@ -128,8 +88,8 @@ const std::string& ChooseRandomKey() {
 
 //////////////////////////////////////////////////////////////////////
 
-[[noreturn]] void Adversary() {
-  timber::Logger logger_{"Adversary", node::rt::LoggerBackend()};
+[[noreturn]] void NetAdversary() {
+  timber::Logger logger_{"Net-Adversary", node::rt::LoggerBackend()};
 
   // List system nodes
   auto pool = node::rt::Discovery()->ListPool("kv");
@@ -145,9 +105,71 @@ const std::string& ChooseRandomKey() {
 
     matrix::fault::MakeStar(pool, center);
 
-    node::rt::SleepFor(node::rt::RandomNumber(100, 300));
+    matrix::fault::RandomPause(100_jfs, 300_jfs);
 
     net.Heal();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void NodeAdversary() {
+  timber::Logger logger_{"Node-Adversary", node::rt::LoggerBackend()};
+
+  // List system nodes
+  auto pool = node::rt::Discovery()->ListPool("kv");
+
+  static const matrix::TimePoint kNoMoreFaults = 5000;
+
+  while (matrix::GlobalNow() < kNoMoreFaults) {
+    // Some random delay
+    matrix::fault::RandomPause(200_jfs, 800_jfs);
+
+    auto& victim = matrix::fault::RandomServer(pool);
+
+    switch (node::rt::RandomNumber(3)) {
+      case 0:
+        // Reboot
+        victim.FastReboot();
+        break;
+      case 1:
+        // Freeze
+        victim.Pause();
+        matrix::fault::RandomPause(100_jfs, 300_jfs);
+        victim.Resume();
+        break;
+      case 2:
+        // Clocks
+        victim.AdjustWallClock();
+        break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void NodeReeper() {
+  timber::Logger logger_{"Node-Reeper", node::rt::LoggerBackend()};
+
+  // List system nodes
+  auto pool = node::rt::Discovery()->ListPool("kv");
+
+  // Bound on number of crashes
+  size_t bound = (pool.size() - 1) / 2;
+
+  // [0, bound]
+  size_t crashes = node::rt::RandomNumber(0, bound);
+
+  LOG_INFO("Crash budget: {}", crashes);
+
+  for (size_t i = 0; i < crashes; ++i) {
+    matrix::fault::RandomPause(300_jfs, 1000_jfs);
+
+    auto& victim = matrix::fault::RandomServer(pool);
+
+    if (victim.IsAlive()) {
+      victim.Crash();
+    }
   }
 }
 
@@ -164,8 +186,10 @@ using KVStoreModel = semantics::KVStoreModel<Key, Value>;
 size_t RunSimulation(size_t seed) {
   auto& runner = matrix::TestRunner::Access();
 
-  static const size_t kTimeLimit = 10000;
+  static const Jiffies kTimeLimit = 20000_jfs;
   static const size_t kRequestsThreshold = 7;
+
+  runner.Verbose() << "Simulation seed: " << seed << std::endl;
 
   matrix::Random random{seed};
 
@@ -174,17 +198,18 @@ size_t RunSimulation(size_t seed) {
   const size_t clients = random.Get(2, 3);
   const size_t keys = random.Get(1, 2);
 
-  runner.Debug() << "Simulation seed: " << seed << std::endl;
-
-  runner.Debug() << "Parameters: "
-            << "replicas = " << replicas << ", "
-            << "clients = " << clients << ", "
-            << "keys = " << keys << std::endl;
+  runner.Verbose() << "Parameters: "
+                   << "replicas = " << replicas << ", "
+                   << "clients = " << clients << ", "
+                   << "keys = " << keys << std::endl;
 
   // Reset RPC ids
   commute::rpc::ResetIds();
 
   matrix::facade::World world{seed};
+
+  // Time model
+  world.SetTimeModel(matrix::MakeCrazyTimeModel());
 
   // Cluster
   world.MakePool("kv", KVNodeMain).Size(replicas);
@@ -192,9 +217,25 @@ size_t RunSimulation(size_t seed) {
   // Clients
   world.AddClients(Client, /*count=*/clients);
 
-  world.AddAdversary(Adversary);
+  // Adversaries
+
+  if (random.Maybe(3)) {
+    // Network partitions
+    world.AddAdversary(NetAdversary);
+  }
+
+  if (random.Maybe(7)) {
+    // Reboots, pauses
+    world.AddAdversary(NodeAdversary);
+  }
+
+  if (random.Maybe(11)) {
+    // Crashes
+    world.AddAdversary(NodeReeper);
+  }
 
   // Log file
+
   auto log_fpath = runner.LogFile();
   if (log_fpath) {
     world.WriteLogTo(*log_fpath);
@@ -205,6 +246,7 @@ size_t RunSimulation(size_t seed) {
   world.InitCounter("requests", 0);
 
   // Run simulation
+
   world.Start();
   while (world.GetCounter("requests") < kRequestsThreshold &&
          world.TimeElapsed() < kTimeLimit) {
@@ -217,29 +259,29 @@ size_t RunSimulation(size_t seed) {
   size_t digest = world.Stop();
 
   // Print report
-  runner.Debug() << "Seed " << seed << " -> "
-            << "digest: " << digest << ", time: " << world.TimeElapsed()
-            << ", steps: " << world.StepCount() << std::endl;
+  runner.Verbose() << "Seed " << seed << " -> "
+                   << "digest: " << digest << ", time: " << world.TimeElapsed()
+                   << ", steps: " << world.StepCount() << std::endl;
 
   const auto event_log = world.EventLog();
+
+  runner.Verbose() << "Requests completed: " << world.GetCounter("requests")
+                  << std::endl;
 
   // Time limit exceeded
   if (world.GetCounter("requests") < kRequestsThreshold) {
     // Log
-    std::cout << "Log:" << std::endl;
-    matrix::WriteTextLog(event_log, std::cout);
-    std::cout << std::endl;
+    runner.Report() << "Log:" << std::endl;
+    matrix::WriteTextLog(event_log, runner.Report());
+    runner.Report() << std::endl;
 
     if (world.TimeElapsed() < kTimeLimit) {
-      runner.Out() << "Deadlock in simulation" << std::endl;
+      runner.Report() << "Deadlock in simulation" << std::endl;
     } else {
-      runner.Out() << "Simulation time limit exceeded" << std::endl;
+      runner.Report() << "Simulation time limit exceeded" << std::endl;
     }
     runner.Fail();
   }
-
-  runner.Debug() << "Requests completed: " << world.GetCounter("requests")
-            << std::endl;
 
   // Check linearizability
   const auto history = world.History();
@@ -247,14 +289,14 @@ size_t RunSimulation(size_t seed) {
 
   if (!linearizable) {
     // Log
-    runner.Debug() << "Log:" << std::endl;
-    matrix::WriteTextLog(event_log, runner.Debug());
-    runner.Debug() << std::endl;
+    runner.Verbose() << "Log:" << std::endl;
+    matrix::WriteTextLog(event_log, runner.Verbose());
+    runner.Verbose() << std::endl;
 
     // History
-    runner.Out() << "History is NOT LINEARIZABLE for seed = "
-      << seed << ":" << std::endl;
-    semantics::PrintKVHistory<Key, Value>(history, runner.Out());
+    runner.Report() << "History is NOT LINEARIZABLE for seed = " << seed << ":"
+                    << std::endl;
+    semantics::PrintKVHistory<Key, Value>(history, runner.Report());
 
     runner.Fail();
   }

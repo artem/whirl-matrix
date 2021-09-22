@@ -1,7 +1,6 @@
 #include "main.hpp"
 
 // Node
-#include <whirl/node/program/prologue.hpp>
 #include <whirl/node/runtime/shortcuts.hpp>
 #include <whirl/node/rpc/server.hpp>
 #include <whirl/node/cluster/peer.hpp>
@@ -36,16 +35,16 @@ using namespace whirl;
 
 //////////////////////////////////////////////////////////////////////
 
+// Key -> Value
 using Key = std::string;
 using Value = uint32_t;
 
 //////////////////////////////////////////////////////////////////////
 
 struct WriteTimestamp {
-  // Use sized types!
   uint64_t value;
 
-  static WriteTimestamp Zero() {
+  static WriteTimestamp Min() {
     return {0};
   }
 
@@ -80,10 +79,6 @@ std::ostream& operator<<(std::ostream& out, const StampedValue& stamped_value) {
 }
 
 //////////////////////////////////////////////////////////////////////
-
-// KV storage / bunch of atomic R/W registers
-
-// RPC services / algorithm roles
 
 // Coordinator role, stateless
 
@@ -147,7 +142,7 @@ class Coordinator : public commute::rpc::ServiceBase<Coordinator>,
 
     // Or combine all steps into:
     // auto stamped_values = Await(Quorum(std::move(reads),
-    // Majority())).ValueOrThrow()
+    // Majority())).ValueOrThrow();
 
     for (size_t i = 0; i < stamped_values.size(); ++i) {
       LOG_INFO("{}-th value in read quorum: {}", i + 1, stamped_values[i]);
@@ -182,6 +177,8 @@ class Coordinator : public commute::rpc::ServiceBase<Coordinator>,
   timber::Logger logger_;
 };
 
+//////////////////////////////////////////////////////////////////////
+
 // Storage replica role
 
 class Replica : public commute::rpc::ServiceBase<Replica> {
@@ -215,7 +212,7 @@ class Replica : public commute::rpc::ServiceBase<Replica> {
   }
 
   StampedValue LocalRead(Key key) {
-    return kv_store_.GetOr(key, {0, WriteTimestamp::Zero()});
+    return kv_store_.GetOr(key, {0, WriteTimestamp::Min()});
   }
 
  private:
@@ -235,8 +232,15 @@ class Replica : public commute::rpc::ServiceBase<Replica> {
   timber::Logger logger_;
 };
 
+//////////////////////////////////////////////////////////////////////
+
+// Main routine
+
 void KVNodeMain() {
-  node::program::Prologue();
+  node::rt::PrintLine("Starting at {}", node::rt::WallTimeNow());
+
+  node::rt::Database()->Open(
+      node::rt::Config()->GetString("db.path"));
 
   auto rpc_server =
       node::rpc::MakeServer(node::rt::Config()->GetInt<uint16_t>("rpc.port"));
