@@ -52,8 +52,8 @@ class World {
       : seed_(seed),
         random_source_(seed),
         time_model_(DefaultTimeModel()),
-        network_(&log_),
-        logger_("World", &log_) {
+        network_(&log_backend_),
+        logger_("World", &log_backend_) {
   }
 
   void AddServer(std::string hostname, node::program::Main program) {
@@ -100,7 +100,7 @@ class World {
   }
 
   void WriteLogTo(std::string fpath) {
-    log_.AppendToFile(fpath);
+    log_backend_.AppendToFile(fpath);
   }
 
   IServerTimeModelPtr MakeServerTimeModel(const std::string& hostname) {
@@ -156,7 +156,7 @@ class World {
   }
 
   log::LogBackend& GetLog() {
-    return log_;
+    return log_backend_;
   }
 
   HistoryRecorder& GetHistoryRecorder() {
@@ -294,13 +294,12 @@ class World {
 
   ITimeModelPtr time_model_;
 
-  log::LogBackend log_;
+  log::LogBackend log_backend_;
 
   // Actors
 
   std::map<std::string, Servers> pools_;
   Servers clients_;
-  // O or 1
   Servers adversaries_;
 
   wheels::IdGenerator server_ids_;
