@@ -1,6 +1,6 @@
 # Whirl-Matrix
 
-Deterministic simulator for [Whirl](https://gitlab.com/Lipovsky/whirl)
+Deterministic simulator for [Whirl](https://gitlab.com/whirl-framework/whirl-frontend)
 
 ## Example
 
