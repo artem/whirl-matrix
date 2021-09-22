@@ -222,6 +222,14 @@ class World {
     return guids_.GenerateNext();
   }
 
+  ActorContext::ScopeGuard Scope(IActor* actor) {
+    return active_.Scope(actor);
+  }
+
+  ActorContext::ScopeGuard Scope(IActor& actor) {
+    return active_.Scope(&actor);
+  }
+
  private:
   static ITimeModelPtr DefaultTimeModel();
 
@@ -269,14 +277,6 @@ class World {
 
   void SetStartTime() {
     time_.FastForwardTo(TimeModel()->GlobalStartTime());
-  }
-
-  ActorContext::ScopeGuard Scope(IActor& actor) {
-    return Scope(&actor);
-  }
-
-  ActorContext::ScopeGuard Scope(IActor* actor) {
-    return active_.Scope(actor);
   }
 
   void AddActor(IActor* actor) {

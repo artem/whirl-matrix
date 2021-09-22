@@ -191,7 +191,7 @@ void Transport::HandlePacket(const Packet& packet, Link* out) {
   } else if (packet.header.type == Packet::Type::Data) {
     // Message
 
-    LOG_INFO("Handle message at {} from {}: {}", host_, from, log::FormatMessage(packet.message));
+    LOG_INFO("Handle message from {}: {}", from, log::FormatMessage(packet.message));
 
     auto g = heap_.Use();
 

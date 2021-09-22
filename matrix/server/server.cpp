@@ -2,6 +2,7 @@
 
 #include <matrix/world/global/actor.hpp>
 #include <matrix/world/global/log.hpp>
+#include <matrix/world/global/scope.hpp>
 
 #include <matrix/process/trampoline.hpp>
 
@@ -30,6 +31,8 @@ Server::~Server() {
 // INetServer
 
 void Server::HandlePacket(const net::Packet& packet, net::Link* out) {
+
+  auto actor_scope = SwitchToActor(this);
   transport_.HandlePacket(packet, out);
 }
 
@@ -45,6 +48,8 @@ void Server::Crash() {
   WHEELS_VERIFY(state_ != State::Crashed, "Server already crashed");
 
   LOG_INFO("Crash server {}", HostName());
+
+  auto actor_scope = SwitchToActor(this);
 
   // Remove all network endpoints
   transport_.Reset();
@@ -91,6 +96,8 @@ void Server::Resume() {
     return;
   }
 
+  auto actor_scope = SwitchToActor(this);
+
   WHEELS_VERIFY(state_ == State::Paused, "Server is not paused");
 
   scheduler_.Resume(GlobalNow());
@@ -99,8 +106,14 @@ void Server::Resume() {
 }
 
 void Server::AdjustWallClock() {
+  LOG_INFO("Adjust wall time clock on {}", HostName());
+
   GlobalAllocatorGuard g;
-  wall_clock_.AdjustOffset();
+
+  {
+    auto actor_scope = SwitchToActor(this);
+    wall_clock_.AdjustOffset();
+  }
 }
 
 node::fs::FileList Server::ListFiles(std::string_view prefix) {
@@ -140,7 +153,9 @@ void Server::Launch() {
   WHEELS_VERIFY(state_ == State::Initial || state_ == State::Crashed,
                 "Invalid state");
 
-  monotonic_clock_.Reset(time_model_.get());
+  auto actor_scope = SwitchToActor(this);
+
+  monotonic_clock_.Reset();
 
   LOG_INFO("Starting process");
   StartProcess();

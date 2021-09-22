@@ -5,6 +5,7 @@
 #include <matrix/world/global/time.hpp>
 #include <matrix/world/global/vars.hpp>
 #include <matrix/world/global/guids.hpp>
+#include <matrix/world/global/scope.hpp>
 
 #include <matrix/time_model/time_model.hpp>
 #include <matrix/history/recorder.hpp>

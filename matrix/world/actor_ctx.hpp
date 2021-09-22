@@ -13,7 +13,7 @@ class ActorContext {
   class ScopeGuard {
    public:
     ScopeGuard(Ctx* ctx, IActor* actor) : ctx_(ctx), actor_(actor) {
-      WHEELS_VERIFY(ctx->NotSet(), "Current actor already set");
+      parent_ = ctx_->current_;
       ctx_->current_ = actor;
     }
 
@@ -22,12 +22,14 @@ class ActorContext {
     }
 
     ~ScopeGuard() {
-      ctx_->current_ = nullptr;
+      // Rollback
+      ctx_->current_ = parent_;
     }
 
    private:
     Ctx* ctx_;
     IActor* actor_;
+    IActor* parent_;
   };
 
   ScopeGuard Scope(IActor* actor) {
