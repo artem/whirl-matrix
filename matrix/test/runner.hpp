@@ -25,6 +25,10 @@ class TestRunner {
     verbose_ = true;
   }
 
+  void BeQuiet() {
+    verbose_ = false;
+  }
+
   void WriteLogTo(const std::string& path) {
     log_path_.emplace(path);
     ResetLogFile();
@@ -86,7 +90,7 @@ class TestRunner {
  private:
   Simulation sim_;
 
-  bool verbose_{false};
+  bool verbose_{true};
   std::optional<std::filesystem::path> log_path_;
 
   std::stringstream sink_;

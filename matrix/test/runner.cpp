@@ -4,6 +4,8 @@
 
 #include <wheels/support/assert.hpp>
 
+#include <wheels/support/progress.hpp>
+
 #include <random>
 #include <fstream>
 #include <filesystem>
@@ -52,11 +54,28 @@ void TestRunner::TestDeterminism() {
 void TestRunner::RunSimulations(size_t count) {
   std::mt19937 seeds{42};
 
-  Out() << "Run simulations..." << std::endl;
+  Out() << "Run " << count << " simulations..." << std::endl;
+
+  wheels::ProgressBar progress_bar("Progress", {false, '#', 50});
+
+  if (!verbose_) {
+    progress_bar.Start(count);
+  }
 
   for (size_t i = 1; i <= count; ++i) {
-    Debug() << "Simulation " << i << "...";
+    if (verbose_) {
+      Debug() << "Simulation " << i << "...";
+    }
+
     RunSimulation(/*seed=*/seeds());
+
+    if (!verbose_) {
+      progress_bar.MakeProgress();
+    }
+  }
+
+  if (!verbose_) {
+    progress_bar.Complete();
   }
 }
 

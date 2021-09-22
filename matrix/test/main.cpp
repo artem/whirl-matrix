@@ -15,7 +15,7 @@ static void CLI(wheels::ArgumentParser& parser) {
   parser.Add("sims").ValueDescr("uint").Optional().Help("Number of simulations to run");
   parser.Add("seed").ValueDescr("uint").Optional();
   parser.Add("log").ValueDescr("path").Optional();
-  parser.Add("verbose").Flag().Help("Print debug message");
+  parser.Add("quiet").Flag().Help("Be quiet");
 }
 
 template <typename T>
@@ -40,8 +40,8 @@ int Main(int argc, const char** argv, Simulation sim) {
     runner.WriteLogTo(args.Get("log"));
   }
 
-  if (args.HasFlag("verbose")) {
-    runner.BeVerbose();
+  if (args.HasFlag("quiet")) {
+    runner.BeQuiet();
   }
 
   if (args.Has("seed")) {
@@ -54,8 +54,10 @@ int Main(int argc, const char** argv, Simulation sim) {
     runner.TestDeterminism();
   }
 
-  size_t sims_count = FromString<size_t>(args.Get("sims"));
-  runner.RunSimulations(sims_count);
+  if (args.Has("sims")) {
+    size_t count = FromString<size_t>(args.Get("sims"));
+    runner.RunSimulations(count);
+  }
 
   runner.Congratulate();
 
