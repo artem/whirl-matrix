@@ -68,7 +68,7 @@ class CrazyTimeModel : public ITimeModel {
   // Server
 
   IServerTimeModelPtr MakeServerModel(const std::string& /*host*/) override {
-    return std::make_shared<CrazyServerTimeModel>();
+    return std::make_unique<CrazyServerTimeModel>();
   }
 
   // Network
@@ -95,7 +95,7 @@ class CrazyTimeModel : public ITimeModel {
 //////////////////////////////////////////////////////////////////////
 
 ITimeModelPtr MakeCrazyTimeModel() {
-  return std::make_shared<CrazyTimeModel>();
+  return std::make_unique<CrazyTimeModel>();
 }
 
 }  // namespace whirl::matrix

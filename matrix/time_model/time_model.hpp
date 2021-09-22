@@ -45,7 +45,7 @@ struct IServerTimeModel {
   virtual Jiffies ThreadPause() = 0;
 };
 
-using IServerTimeModelPtr = std::shared_ptr<IServerTimeModel>;
+using IServerTimeModelPtr = std::unique_ptr<IServerTimeModel>;
 
 /////////////////////////////////////////////////////////////////////
 
@@ -67,6 +67,6 @@ struct ITimeModel {
   virtual commute::rpc::BackoffParams BackoffParams() = 0;
 };
 
-using ITimeModelPtr = std::shared_ptr<ITimeModel>;
+using ITimeModelPtr = std::unique_ptr<ITimeModel>;
 
 }  // namespace whirl::matrix

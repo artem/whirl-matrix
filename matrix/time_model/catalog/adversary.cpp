@@ -48,7 +48,7 @@ class AdversaryTimeModel : public IServerTimeModel {
 //////////////////////////////////////////////////////////////////////
 
 IServerTimeModelPtr MakeAdversaryTimeModel() {
-  return std::make_shared<AdversaryTimeModel>();
+  return std::make_unique<AdversaryTimeModel>();
 }
 
 }  // namespace whirl::matrix
