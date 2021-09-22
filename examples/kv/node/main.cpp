@@ -28,8 +28,8 @@
 
 #include <algorithm>
 
-using await::futures::Future;
 using await::fibers::Await;
+using await::futures::Future;
 using wheels::Result;
 
 using namespace whirl;
@@ -75,7 +75,7 @@ struct StampedValue {
 
 std::ostream& operator<<(std::ostream& out, const StampedValue& stamped_value) {
   out << "{" << stamped_value.value << ", ts: " << stamped_value.timestamp
-  << "}";
+      << "}";
   return out;
 }
 
@@ -87,10 +87,12 @@ std::ostream& operator<<(std::ostream& out, const StampedValue& stamped_value) {
 
 // Coordinator role, stateless
 
-class Coordinator : public commute::rpc::ServiceBase<Coordinator>, public node::cluster::Peer {
+class Coordinator : public commute::rpc::ServiceBase<Coordinator>,
+                    public node::cluster::Peer {
  public:
-  Coordinator() : Peer(node::rt::Config()),
-  logger_("KVNode.Coordinator", node::rt::LoggerBackend()) {
+  Coordinator()
+      : Peer(node::rt::Config()),
+        logger_("KVNode.Coordinator", node::rt::LoggerBackend()) {
   }
 
   void RegisterMethods() override {
@@ -109,11 +111,11 @@ class Coordinator : public commute::rpc::ServiceBase<Coordinator>, public node::
     // Broadcast
     for (const auto& peer : ListPeers(/*with_me=*/true)) {
       writes.push_back(  //
-      commute::rpc::Call("Replica.LocalWrite")
-      .Args<Key, StampedValue>(key, {value, write_ts})
-      .Via(Channel(peer))
-      .Context(await::context::ThisFiber())
-      .AtLeastOnce());
+          commute::rpc::Call("Replica.LocalWrite")
+              .Args<Key, StampedValue>(key, {value, write_ts})
+              .Via(Channel(peer))
+              .Context(await::context::ThisFiber())
+              .AtLeastOnce());
     }
 
     // Await acknowledgements from the majority of storage replicas
@@ -126,11 +128,11 @@ class Coordinator : public commute::rpc::ServiceBase<Coordinator>, public node::
     // Broadcast LocalRead request to replicas
     for (const auto& peer : ListPeers(/*with_me=*/true)) {
       reads.push_back(  //
-      commute::rpc::Call("Replica.LocalRead")
-      .Args(key)
-      .Via(Channel(peer))
-      .Context(await::context::ThisFiber())
-      .AtLeastOnce());
+          commute::rpc::Call("Replica.LocalRead")
+              .Args(key)
+              .Via(Channel(peer))
+              .Context(await::context::ThisFiber())
+              .AtLeastOnce());
     }
 
     // Await responses from the majority of replicas
@@ -148,8 +150,7 @@ class Coordinator : public commute::rpc::ServiceBase<Coordinator>, public node::
     // Majority())).ValueOrThrow()
 
     for (size_t i = 0; i < stamped_values.size(); ++i) {
-      LOG_INFO("{}-th value in read quorum: {}", i + 1,
-               stamped_values[i]);
+      LOG_INFO("{}-th value in read quorum: {}", i + 1, stamped_values[i]);
     }
 
     auto most_recent = FindMostRecent(stamped_values);
@@ -185,8 +186,9 @@ class Coordinator : public commute::rpc::ServiceBase<Coordinator>, public node::
 
 class Replica : public commute::rpc::ServiceBase<Replica> {
  public:
-  Replica() : kv_store_(node::rt::Database(), "abd"),
-  logger_("KVNode.Replica", node::rt::LoggerBackend()) {
+  Replica()
+      : kv_store_(node::rt::Database(), "data"),
+        logger_("KVNode.Replica", node::rt::LoggerBackend()) {
   }
 
   void RegisterMethods() override {
@@ -236,8 +238,8 @@ class Replica : public commute::rpc::ServiceBase<Replica> {
 void KVNodeMain() {
   node::program::Prologue();
 
-  auto rpc_server = node::rpc::MakeServer(
-      node::rt::Config()->GetInt<uint16_t>("rpc.port"));
+  auto rpc_server =
+      node::rpc::MakeServer(node::rt::Config()->GetInt<uint16_t>("rpc.port"));
 
   rpc_server->RegisterService("KV", std::make_shared<Coordinator>());
   rpc_server->RegisterService("Replica", std::make_shared<Replica>());
