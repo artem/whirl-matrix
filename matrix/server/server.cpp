@@ -140,7 +140,7 @@ void Server::Launch() {
   WHEELS_VERIFY(state_ == State::Initial || state_ == State::Crashed,
                 "Invalid state");
 
-  monotonic_clock_.Reset();
+  monotonic_clock_.Reset(time_model_.get());
 
   LOG_INFO("Starting process");
   StartProcess();

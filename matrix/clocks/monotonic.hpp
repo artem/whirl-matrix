@@ -19,7 +19,11 @@ class MonotonicClock {
   }
 
   void Reset() {
-    init_ = ThisServerTimeModel()->ResetMonotonicClock();
+    Reset(ThisServerTimeModel());
+  }
+
+  void Reset(IServerTimeModel* time_model) {
+    init_ = time_model->ResetMonotonicClock();
     last_reset_ = GlobalNow();
   }
 
