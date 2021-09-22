@@ -76,27 +76,27 @@ void World::Start() {
 bool World::Step() {
   WorldGuard g(this);
 
-  NextStep next = FindNextStep();
-  if (!next.actor) {
+  auto next = FindNextStep();
+  if (!next.has_value()) {
     return false;
   }
 
   ++step_number_;
 
-  digest_.Eat(next.time).Eat(next.actor_index);
+  digest_.Eat(next->time).Eat(next->actor_index);
 
-  time_.FastForwardTo(next.time);
-  Scope(next.actor)->Step();
+  time_.FastForwardTo(next->time);
+  Scope(next->actor)->Step();
 
   return true;
 }
 
-NextStep World::FindNextStep() {
+std::optional<NextStep> World::FindNextStep() {
   if (actors_.empty()) {
-    return NextStep::NoStep();
+    return std::nullopt;
   }
 
-  auto next_step = NextStep::NoStep();
+  std::optional<NextStep> next_step;
 
   for (size_t i = 0; i < actors_.size(); ++i) {
     IActor* actor = actors_[i];
@@ -104,10 +104,8 @@ NextStep World::FindNextStep() {
     if (actor->IsRunnable()) {
       TimePoint next_step_time = actor->NextStepTime();
 
-      if (!next_step.actor || next_step_time < next_step.time) {
-        next_step.actor = actor;
-        next_step.time = next_step_time;
-        next_step.actor_index = i;
+      if (!next_step || next_step_time < next_step->time) {
+        next_step = {actor, i, next_step_time};
       }
     }
   }

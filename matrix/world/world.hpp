@@ -29,12 +29,8 @@ namespace whirl::matrix {
 
 struct NextStep {
   IActor* actor;
-  TimePoint time;
   size_t actor_index;
-
-  static NextStep NoStep() {
-    return {nullptr, 0, 0};
-  }
+  TimePoint time;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -126,10 +122,6 @@ class World {
   void RunFor(Jiffies time_budget);
 
   void RestartServer(const std::string& hostname);
-
-  size_t NumClients() const {
-    return clients_.size();
-  }
 
   // Methods used by running actors
 
@@ -283,7 +275,7 @@ class World {
     actors_.push_back(actor);
   }
 
-  NextStep FindNextStep();
+  std::optional<NextStep> FindNextStep();
 
  private:
   const size_t seed_;
