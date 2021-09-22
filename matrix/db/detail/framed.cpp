@@ -3,6 +3,7 @@
 #include <wheels/io/read.hpp>
 #include <wheels/io/write.hpp>
 #include <wheels/io/limit.hpp>
+#include <wheels/io/string.hpp>
 
 #include <wheels/memory/view_of.hpp>
 
@@ -35,14 +36,22 @@ std::optional<detail::FrameHeader> FramedReader::ReadNextFrameHeader() {
 
 //////////////////////////////////////////////////////////////////////
 
-void FramedWriter::WriteFrame(const std::string& frame) {
-  WriteFrameHeader(frame);
+void FramedWriter::WriteFrame(const std::string& data) {
+  std::string frame;
+  wheels::io::StringWriter frame_writer(frame);
+
+  WriteFrameHeader(data, &frame_writer);
+  frame_writer.Write(wheels::ViewOf(data));
+
+  // One frame = one write
   writer_->Write(wheels::ViewOf(frame));
 }
 
-void FramedWriter::WriteFrameHeader(const std::string& frame) {
+void FramedWriter::WriteFrameHeader(
+    const std::string& frame,
+    wheels::io::IWriter* writer) {
   detail::FrameHeader header{frame.length()};
-  writer_->Write(detail::MutViewOf(header));
+  writer->Write(detail::MutViewOf(header));
 }
 
 }  // namespace whirl

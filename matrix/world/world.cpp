@@ -63,10 +63,11 @@ void World::Start() {
     Scope(client)->Start();
   }
 
-  // Start adversary
-  if (!adversaries_.empty()) {
-    LOG_INFO("Starting adversary...");
-    Scope(adversaries_.front())->Start();
+  LOG_INFO("Starting adversaries...");
+
+  // Start adversaries
+  for (auto& adv : adversaries_) {
+    Scope(adv)->Start();
   }
 
   LOG_INFO("World started");
@@ -117,20 +118,26 @@ NextStep World::FindNextStep() {
 size_t World::Stop() {
   WorldGuard g(this);
 
-  // Adversary
+  // Adversaries
+
   if (!adversaries_.empty()) {
-    Scope(adversaries_.front())->Shutdown();
+    for (auto& adv : adversaries_) {
+      Scope(adv)->Shutdown();
+    }
   }
+  adversaries_.clear();
 
   LOG_INFO("Adversary stopped");
 
   // Network
+
   digest_.Combine(network_.Digest());
   Scope(network_)->Shutdown();
 
   LOG_INFO("Network stopped");
 
   // Servers
+
   for (auto& [_, pool] : pools_) {
     for (auto& server : pool) {
       digest_.Combine(server.ComputeDigest());
@@ -143,6 +150,7 @@ size_t World::Stop() {
   LOG_INFO("Servers stopped");
 
   // Clients
+
   for (auto& client : clients_) {
     Scope(client)->Shutdown();
   }
@@ -151,6 +159,8 @@ size_t World::Stop() {
   LOG_INFO("Clients stopped");
 
   actors_.clear();
+
+  // Finalize
 
   history_recorder_.Finalize();
 

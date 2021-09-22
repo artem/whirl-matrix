@@ -47,10 +47,12 @@ class FramedWriter : private wheels::NonCopyable {
   explicit FramedWriter(wheels::io::IWriter* writer) : writer_(writer) {
   }
 
-  void WriteFrame(const std::string& frame);
+  void WriteFrame(const std::string& data);
 
  private:
-  void WriteFrameHeader(const std::string& frame);
+  static void WriteFrameHeader(
+      const std::string& frame,
+      wheels::io::IWriter* writer);
 
  private:
   wheels::io::IWriter* writer_;

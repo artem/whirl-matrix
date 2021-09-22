@@ -11,12 +11,15 @@ namespace whirl::matrix::clocks {
 
 class MonotonicClock {
  public:
-  MonotonicClock() : drift_(TimeModel()->InitClockDrift()) {
+  MonotonicClock() = default;
+
+  void Init() {
+    drift_ = ThisServerTimeModel()->InitClockDrift();
     Reset();
   }
 
   void Reset() {
-    init_ = TimeModel()->ResetMonotonicClock();
+    init_ = ThisServerTimeModel()->ResetMonotonicClock();
     last_reset_ = GlobalNow();
   }
 
@@ -36,9 +39,9 @@ class MonotonicClock {
   }
 
  private:
-  Drift drift_;
-  TimePoint last_reset_;
-  TimePoint init_;
+  Drift drift_{0};
+  TimePoint last_reset_{0};
+  TimePoint init_{0};
 };
 
 }  // namespace whirl::matrix::clocks

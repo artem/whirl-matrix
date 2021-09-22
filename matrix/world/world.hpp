@@ -11,6 +11,8 @@
 #include <matrix/history/recorder.hpp>
 #include <matrix/log/backend.hpp>
 
+#include <matrix/world/time_models/adversary.hpp>
+
 #include <matrix/helpers/digest.hpp>
 #include <matrix/helpers/untyped_dict.hpp>
 
@@ -81,7 +83,7 @@ class World {
               /*host_name_template=*/"Client");
   }
 
-  void SetAdversary(node::program::Main program) {
+  void AddAdversary(node::program::Main program) {
     WorldGuard g(this);
 
     AddToPool(adversaries_, program,
@@ -99,6 +101,14 @@ class World {
 
   void WriteLogTo(std::string fpath) {
     log_.AppendToFile(fpath);
+  }
+
+  IServerTimeModelPtr MakeServerTimeModel(const std::string& hostname) {
+    // TODO
+    if (hostname.starts_with("Adversary")) {
+      return MakeAdversaryTimeModel();
+    }
+    return time_model_->MakeServerModel(hostname);
   }
 
   void Start();

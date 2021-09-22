@@ -4,6 +4,7 @@
 #include <whirl/node/program/main.hpp>
 
 #include <matrix/world/actor.hpp>
+#include <matrix/world/time_model.hpp>
 #include <matrix/fault/server.hpp>
 
 #include <matrix/config/server.hpp>
@@ -65,6 +66,7 @@ class Server : public IActor, public fault::IFaultyServer, public net::IServer {
   // - Execution
 
   void Crash() override;
+  void Launch() override;
   void FastReboot() override;
 
   void Pause() override;
@@ -83,7 +85,6 @@ class Server : public IActor, public fault::IFaultyServer, public net::IServer {
 
   const std::string& Name() const override;
 
-  // Share with IFaultyServer
   void Start() override;
 
   bool IsRunnable() const override;
@@ -101,12 +102,16 @@ class Server : public IActor, public fault::IFaultyServer, public net::IServer {
 
   node::IRuntime& GetNodeRuntime();
 
+  IServerTimeModel* GetTimeModel();
+
  private:
   node::IRuntime* MakeNodeRuntime();
   void StartProcess();
 
  private:
   State state_{State::Initial};
+
+  IServerTimeModelPtr time_model_;
 
   ServerConfig config_;
   node::program::Main program_;

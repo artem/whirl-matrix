@@ -14,15 +14,14 @@ namespace whirl::matrix {
 // NB: Time model is accessed from "userspace" => do not allocate memory
 // in method calls
 
-struct ITimeModel {
-  virtual ~ITimeModel() = default;
+/////////////////////////////////////////////////////////////////////
 
-  virtual TimePoint GlobalStartTime() = 0;
+struct IServerTimeModel {
+  virtual ~IServerTimeModel() = default;
 
-  // Clocks
+  // Clock drift
 
   virtual int InitClockDrift() = 0;
-  virtual int ClockDriftBound() = 0;
 
   // Monotonic clock
 
@@ -41,6 +40,24 @@ struct ITimeModel {
   virtual Jiffies DiskWrite(size_t bytes) = 0;
   virtual Jiffies DiskRead(size_t bytes) = 0;
 
+  // Threads
+
+  virtual Jiffies ThreadPause() = 0;
+};
+
+using IServerTimeModelPtr = std::shared_ptr<IServerTimeModel>;
+
+/////////////////////////////////////////////////////////////////////
+
+struct ITimeModel {
+  virtual ~ITimeModel() = default;
+
+  virtual TimePoint GlobalStartTime() = 0;
+
+  // Server
+
+  virtual IServerTimeModelPtr MakeServerModel(const std::string& host) = 0;
+
   // Network
 
   // DPI =)
@@ -48,10 +65,6 @@ struct ITimeModel {
                              const net::Packet& packet) = 0;
 
   virtual commute::rpc::BackoffParams BackoffParams() = 0;
-
-  // Threads
-
-  virtual Jiffies ThreadPause() = 0;
 };
 
 using ITimeModelPtr = std::shared_ptr<ITimeModel>;

@@ -13,6 +13,10 @@ class Random {
     return min_value + Generate() % (max_value - min_value + 1);
   }
 
+  size_t Maybe(size_t count) {
+    return twister_() % count == 0;
+  }
+
  private:
   size_t Generate() {
     return twister_();

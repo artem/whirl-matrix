@@ -2,6 +2,8 @@
 
 #include <matrix/world/world.hpp>
 
+#include <matrix/server/server.hpp>
+
 namespace whirl::matrix {
 
 static World* ThisWorld() {
@@ -32,6 +34,14 @@ TimePoint GlobalNow() {
 
 ITimeModel* TimeModel() {
   return ThisWorld()->TimeModel();
+}
+
+IServerTimeModel* ThisServerTimeModel() {
+  return ThisServer().GetTimeModel();
+}
+
+IServerTimeModelPtr AcquireTimeModel(const std::string& hostname) {
+  return ThisWorld()->MakeServerTimeModel(hostname);
 }
 
 bool IsThereAdversary() {

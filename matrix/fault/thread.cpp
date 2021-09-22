@@ -16,7 +16,7 @@ void ThreadPause() {
     return;
   }
 
-  auto pause = TimeModel()->ThreadPause();
+  auto pause = ThisServerTimeModel()->ThreadPause();
   auto after = runtime.TimeService()->After(pause);
   await::fibers::Await(std::move(after)).ExpectOk();
 }

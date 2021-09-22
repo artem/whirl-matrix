@@ -22,7 +22,7 @@ struct IFaultyServer {
 
   virtual void Crash() = 0;
   // After Crash
-  virtual void Start() = 0;
+  virtual void Launch() = 0;
 
   virtual void FastReboot() = 0;
 

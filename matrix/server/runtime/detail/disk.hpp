@@ -18,11 +18,11 @@ class Disk {
   }
 
   void Read(size_t bytes) const {
-    BlockFor(TimeModel()->DiskRead(bytes));
+    BlockFor(ThisServerTimeModel()->DiskRead(bytes));
   }
 
   void Write(size_t bytes) {
-    BlockFor(TimeModel()->DiskWrite(bytes));
+    BlockFor(ThisServerTimeModel()->DiskWrite(bytes));
   }
 
  private:

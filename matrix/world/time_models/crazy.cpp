@@ -4,8 +4,11 @@
 
 namespace whirl::matrix {
 
-class CrazyTimeModel : public ITimeModel {
-  // Time
+//////////////////////////////////////////////////////////////////////
+
+class CrazyServerTimeModel : public IServerTimeModel {
+ public:
+  // Clocks
 
   // [-75, +75]
   int InitClockDrift() override {
@@ -23,14 +26,6 @@ class CrazyTimeModel : public ITimeModel {
     // return -75 + (int)GlobalRandomNumber(75 * 2 + 1);
   }
 
-  int ClockDriftBound() override {
-    return 300;
-  }
-
-  TimePoint GlobalStartTime() override {
-    return GlobalRandomNumber(1000);
-  }
-
   TimePoint ResetMonotonicClock() override {
     return GlobalRandomNumber(1, 100);
   }
@@ -39,9 +34,13 @@ class CrazyTimeModel : public ITimeModel {
     return GlobalRandomNumber(1000);
   }
 
+  // TrueTime
+
   Jiffies TrueTimeUncertainty() override {
     return GlobalRandomNumber(5, 500);
   }
+
+  // Disk
 
   Jiffies DiskWrite(size_t /*bytes*/) override {
     return GlobalRandomNumber(10, 250);
@@ -49,6 +48,27 @@ class CrazyTimeModel : public ITimeModel {
 
   Jiffies DiskRead(size_t /*bytes*/) override {
     return GlobalRandomNumber(10, 50);
+  }
+
+  // Threads
+
+  Jiffies ThreadPause() override {
+    return GlobalRandomNumber(5, 50);
+  }
+};
+
+//////////////////////////////////////////////////////////////////////
+
+class CrazyTimeModel : public ITimeModel {
+ public:
+  TimePoint GlobalStartTime() override {
+    return GlobalRandomNumber(1, 200);
+  }
+
+  // Server
+
+  IServerTimeModelPtr MakeServerModel(const std::string& /*host*/) override {
+    return std::make_shared<CrazyServerTimeModel>();
   }
 
   // Network
@@ -70,12 +90,9 @@ class CrazyTimeModel : public ITimeModel {
     return {50, 1000, 2};
   }
 
-  // Threads
-
-  Jiffies ThreadPause() override {
-    return GlobalRandomNumber(5, 50);
-  }
 };
+
+//////////////////////////////////////////////////////////////////////
 
 ITimeModelPtr MakeCrazyTimeModel() {
   return std::make_shared<CrazyTimeModel>();

@@ -42,7 +42,7 @@ void World::SetTimeModel(ITimeModelPtr time_model) {
 }
 
 void World::AddAdversary(node::program::Main program) {
-  impl_->SetAdversary(program);
+  impl_->AddAdversary(program);
 }
 
 void World::WriteLogTo(std::string fpath) {

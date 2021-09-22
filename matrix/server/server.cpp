@@ -65,12 +65,20 @@ void Server::Crash() {
 void Server::FastReboot() {
   GlobalAllocatorGuard g;
 
+  if (!IsAlive()) {
+    return;
+  }
+
   Crash();
-  Start();
+  Launch();
 }
 
 void Server::Pause() {
   GlobalAllocatorGuard g;
+
+  if (!IsAlive()) {
+    return;
+  }
 
   WHEELS_VERIFY(state_ != State::Paused, "Server already paused");
   state_ = State::Paused;
@@ -78,6 +86,10 @@ void Server::Pause() {
 
 void Server::Resume() {
   GlobalAllocatorGuard g;
+
+  if (!IsAlive()) {
+    return;
+  }
 
   WHEELS_VERIFY(state_ == State::Paused, "Server is not paused");
 
@@ -116,6 +128,15 @@ const std::string& Server::Name() const {
 }
 
 void Server::Start() {
+  time_model_ = AcquireTimeModel(config_.hostname);
+
+  wall_clock_.Init();
+  monotonic_clock_.Init();
+
+  Launch();
+}
+
+void Server::Launch() {
   WHEELS_VERIFY(state_ == State::Initial || state_ == State::Crashed,
                 "Invalid state");
 
@@ -209,6 +230,10 @@ node::IRuntime* Server::MakeNodeRuntime() {
 
 node::IRuntime& Server::GetNodeRuntime() {
   return *runtime_;
+}
+
+IServerTimeModel* Server::GetTimeModel() {
+  return time_model_.get();
 }
 
 //////////////////////////////////////////////////////////////////////

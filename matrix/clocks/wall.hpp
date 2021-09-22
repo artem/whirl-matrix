@@ -3,17 +3,21 @@
 #include <whirl/node/time/wall_time.hpp>
 
 #include <matrix/world/global/time.hpp>
-#include <matrix/world/global/time_model.hpp>
+
+#include <matrix/world/time_model.hpp>
 
 namespace whirl::matrix::clocks {
 
 class WallClock {
  public:
-  WallClock() : offset_(InitLocalClockOffset()) {
+  WallClock() = default;
+
+  void Init() {
+    offset_ = InitOffset();
   }
 
   void AdjustOffset() {
-    offset_ = InitLocalClockOffset();
+    offset_ = InitOffset();
     // This action does not affect active timers:
     // they rely on monotonic clock
   }
@@ -23,8 +27,8 @@ class WallClock {
   }
 
  private:
-  static Jiffies InitLocalClockOffset() {
-    return TimeModel()->InitWallClockOffset();
+  static Jiffies InitOffset() {
+    return ThisServerTimeModel()->InitWallClockOffset();
   }
 
  private:
