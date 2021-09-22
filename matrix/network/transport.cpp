@@ -76,7 +76,7 @@ ServerSocket Transport::Serve(Port port, ISocketHandler* handler) {
   auto ts = GetNewEndpointTimestamp();
   endpoints_.emplace(port, Endpoint{handler, ts});
 
-  LOG_INFO("Start serving at port {}", port);
+  LOG_INFO("Serving at port {}", port);
 
   {
     auto g = heap_.Use();
