@@ -6,11 +6,10 @@ Deterministic simulator for [Whirl](https://gitlab.com/whirl-framework/whirl-fro
 
 [KV](/examples/kv/main.cpp) – simple replicated KV store
 
-- Quorum reads/writes
-- Last-write-wins via wall clock
-- Persistent local storage
+- Quorum reads / writes
+- Timestamp ordering via wall clocks
 
-Note: Implementation _intentionally_ violates [linearizability](https://jepsen.io/consistency/models/linearizable)!
+Note: this implementation _intentionally_ violates [linearizability](https://jepsen.io/consistency/models/linearizable)!
 
 Use Attiya, Bar-Noy, Dolev (ABD) algorithm for linearizable behaviour:
 - [Original paper](https://groups.csail.mit.edu/tds/papers/Attiya/TM-423.pdf)
@@ -84,4 +83,4 @@ make whirl_example_kv
 # Run kv example
 # --det - run determinism check
 # --sims - number of simulations to run
-./examples/kv/whirl_example_kv --det --sims 12345 --verbose
+./examples/kv/whirl_example_kv --det --sims 12345
