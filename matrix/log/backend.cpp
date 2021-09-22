@@ -36,7 +36,7 @@ timber::Level LogBackend::GetMinLevelFor(const std::string& component) const {
 
 void LogBackend::Log(timber::Event event) {
   GlobalAllocatorGuard g;
-  Write(MakeMatrixEvent(event));
+  Write(CaptureMatrixContext(event));
 }
 
 void LogBackend::AppendToFile(const std::string& path) {

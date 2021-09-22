@@ -48,7 +48,7 @@ static std::string DescribeThisActor() {
 
 //////////////////////////////////////////////////////////////////////
 
-Event MakeMatrixEvent(const timber::Event& e) {
+Event CaptureMatrixContext(const timber::Event& e) {
   Event event;
 
   event.time = GlobalNow();
