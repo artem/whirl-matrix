@@ -7,11 +7,11 @@
 #include <matrix/world/actor.hpp>
 #include <matrix/world/actor_ctx.hpp>
 #include <matrix/world/random_source.hpp>
-#include <matrix/world/time_model.hpp>
+#include <matrix/time_model/time_model.hpp>
 #include <matrix/history/recorder.hpp>
 #include <matrix/log/backend.hpp>
 
-#include <matrix/world/time_models/adversary.hpp>
+#include <matrix/time_model/catalog/adversary.hpp>
 
 #include <matrix/helpers/digest.hpp>
 #include <matrix/helpers/untyped_dict.hpp>

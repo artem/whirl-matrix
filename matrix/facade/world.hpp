@@ -1,6 +1,6 @@
 #pragma once
 
-#include <matrix/world/time_model.hpp>
+#include <matrix/time_model/time_model.hpp>
 #include <matrix/log/event.hpp>
 #include <matrix/semantics/history.hpp>
 #include <whirl/node/program/main.hpp>

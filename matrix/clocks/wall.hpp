@@ -4,7 +4,7 @@
 
 #include <matrix/world/global/time.hpp>
 
-#include <matrix/world/time_model.hpp>
+#include <matrix/time_model/time_model.hpp>
 
 namespace whirl::matrix::clocks {
 

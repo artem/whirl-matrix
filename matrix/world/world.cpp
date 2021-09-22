@@ -1,6 +1,6 @@
 #include <matrix/world/world.hpp>
 
-#include <matrix/world/time_models/crazy.hpp>
+#include <matrix/time_model/catalog/crazy.hpp>
 
 #include <matrix/runtime/setup.hpp>
 

@@ -4,7 +4,7 @@
 #include <whirl/node/program/main.hpp>
 
 #include <matrix/world/actor.hpp>
-#include <matrix/world/time_model.hpp>
+#include <matrix/time_model/time_model.hpp>
 #include <matrix/fault/server.hpp>
 
 #include <matrix/config/server.hpp>

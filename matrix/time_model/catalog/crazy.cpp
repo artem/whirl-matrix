@@ -1,4 +1,4 @@
-#include <matrix/world/time_models/crazy.hpp>
+#include <matrix/time_model/catalog/crazy.hpp>
 
 #include <matrix/world/global/random.hpp>
 
