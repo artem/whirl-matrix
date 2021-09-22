@@ -5,6 +5,6 @@
 namespace whirl::matrix::log {
 
 // Format bytes produced by muesli::Serialize
-std::string FormatMessage(std::string bytes);
+std::string FormatMessage(const std::string& bytes);
 
 }  // namespace whirl::matrix::net

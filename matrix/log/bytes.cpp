@@ -6,7 +6,7 @@
 
 namespace whirl::matrix::log {
 
-std::string FormatMessage(std::string bytes) {
+std::string FormatMessage(const std::string& bytes) {
   if (muesli::archives::IsBinaryFormat()) {
     return "<binary>";
   } else {
