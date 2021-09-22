@@ -40,8 +40,4 @@ LogLevels GetLogLevelsFromEnv() {
   return ParseLogLevels(levels_env);
 }
 
-std::optional<std::string> GetLogPathFromEnv() {
-  return wheels::GetEnvVar("WHIRL_LOG_FILE");
-}
-
 }  // namespace whirl::matrix::log
