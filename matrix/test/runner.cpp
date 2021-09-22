@@ -24,7 +24,7 @@ TestRunner& TestRunner::Access() {
 void TestRunner::TestDeterminism() {
   static const size_t kSeed = 104107713;
 
-  Debug() << "Test determinism with seed " << kSeed << ":" << std::endl;
+  Verbose() << "Test determinism with seed " << kSeed << ":" << std::endl;
 
   // ActivateAllocsTracker();
 
@@ -37,24 +37,24 @@ void TestRunner::TestDeterminism() {
   auto allocs_checksum_2 = GlobalAllocsCheckSum();
 
   if (digest1 != digest2) {
-    Out() << "Simulation is not deterministic: digest = "
+    Report() << "Simulation is not deterministic: digest = "
       << digest1 << ", digest2 = {}" << digest2 << std::endl;
     Fail();
   }
 
   // Simulator internal check
   if (allocs_checksum_1 != allocs_checksum_2) {
-    Out() << "Global allocator checksums mismatch" << std::endl;
+    Report() << "Global allocator checksums mismatch" << std::endl;
     Fail();
   }
 
-  Out() << "Determinism test is OK" << std::endl;
+  Report() << "Determinism test is OK" << std::endl;
 }
 
 void TestRunner::RunSimulations(size_t count) {
   std::mt19937 seeds{42};
 
-  Out() << "Run " << count << " simulations..." << std::endl;
+  Report() << "Run " << count << " simulations..." << std::endl;
 
   wheels::ProgressBar progress_bar("Progress", {false, '#', 50});
 
@@ -64,7 +64,7 @@ void TestRunner::RunSimulations(size_t count) {
 
   for (size_t i = 1; i <= count; ++i) {
     if (verbose_) {
-      Debug() << "Simulation " << i << "...";
+      Verbose() << "Simulation " << i << "...";
     }
 
     RunSimulation(/*seed=*/seeds());
@@ -80,11 +80,11 @@ void TestRunner::RunSimulations(size_t count) {
 }
 
 void TestRunner::RunSingleSimulation(size_t seed) {
-  Out() << "Run single simulation with seed = " << seed << std::endl;
+  Report() << "Run single simulation with seed = " << seed << std::endl;
 
   size_t digest = RunSimulation(seed);
 
-  Out() << "Simulation digest = " << digest << std::endl;
+  Report() << "Simulation digest = " << digest << std::endl;
 }
 
 size_t TestRunner::RunSimulation(size_t seed) {
@@ -123,7 +123,7 @@ void TestRunner::ResetLogFile() {
 
   WriteLogHeader();
 
-  Out() << "Log file: " << path << std::endl;
+  Report() << "Log file: " << path << std::endl;
 }
 
 void TestRunner::WriteLogHeader() {

@@ -51,7 +51,7 @@ class TestRunner {
 
   // Output streams
 
-  std::ostream& Debug() {
+  std::ostream& Verbose() {
     if (verbose_) {
       return std::cout;
     } else {
@@ -59,7 +59,7 @@ class TestRunner {
     }
   }
 
-  std::ostream& Out() {
+  std::ostream& Report() {
     return std::cout;
   }
 
