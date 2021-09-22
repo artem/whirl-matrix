@@ -1,4 +1,3 @@
-#include <whirl/node/program/prologue.hpp>
 #include <whirl/node/db/kv.hpp>
 #include <whirl/node/fs/io.hpp>
 
@@ -18,7 +17,8 @@ using namespace whirl;
 //////////////////////////////////////////////////////////////////////
 
 void TestNode() {
-  node::program::Prologue();
+  node::rt::Database()->Open(
+      node::rt::Config()->GetString("db.path"));
 
   if (!node::rt::FileSystem()->Exists("/flag")) {
     node::fs::FileWriter file_writer("/file");

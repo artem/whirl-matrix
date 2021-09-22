@@ -1,5 +1,4 @@
 // Node
-#include <whirl/node/program/prologue.hpp>
 #include <whirl/node/runtime/shortcuts.hpp>
 
 // Simulation
@@ -11,7 +10,6 @@ using namespace whirl;
 //////////////////////////////////////////////////////////////////////
 
 void HelloWorld() {
-  node::program::Prologue();
   node::rt::PrintLine("Hello, World!");
   node::rt::PrintLine("I am '{}' from pool '{}'", node::rt::HostName(),
                       node::rt::Config()->GetString("pool"));

@@ -1,5 +1,4 @@
 // Node
-#include <whirl/node/program/prologue.hpp>
 #include <whirl/node/runtime/shortcuts.hpp>
 #include <whirl/node/rpc/server.hpp>
 
@@ -21,7 +20,6 @@
 
 // Simulation
 #include <matrix/facade/world.hpp>
-#include <matrix/client/main.hpp>
 #include <matrix/client/rpc.hpp>
 #include <matrix/test/event_log.hpp>
 
@@ -84,8 +82,6 @@ class EchoService : public commute::rpc::ServiceBase<EchoService> {
 // Echo server node
 
 void EchoNode() {
-  node::program::Prologue();
-
   auto rpc_server = node::rpc::MakeServer(/*port=*/42);
 
   rpc_server->RegisterService("Echo", std::make_shared<EchoService>());
@@ -98,7 +94,7 @@ void EchoNode() {
 //////////////////////////////////////////////////////////////////////
 
 [[noreturn]] void EchoClient() {
-  matrix::client::Prologue();
+  await::fibers::self::SetName("main");
 
   auto channel = matrix::client::MakeRpcChannel(/*pool_name=*/"echo", 42);
 
