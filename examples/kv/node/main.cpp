@@ -109,7 +109,7 @@ class Coordinator : public commute::rpc::ServiceBase<Coordinator>,
     std::vector<Future<void>> writes;
 
     // Broadcast
-    for (const auto& peer : ListPeers(/*with_me=*/true)) {
+    for (const auto& peer : ListPeers().WithMe()) {
       writes.push_back(  //
           commute::rpc::Call("Replica.LocalWrite")
               .Args<Key, StampedValue>(key, {value, write_ts})
@@ -126,7 +126,7 @@ class Coordinator : public commute::rpc::ServiceBase<Coordinator>,
     std::vector<Future<StampedValue>> reads;
 
     // Broadcast LocalRead request to replicas
-    for (const auto& peer : ListPeers(/*with_me=*/true)) {
+    for (const auto& peer : ListPeers().WithMe()) {
       reads.push_back(  //
           commute::rpc::Call("Replica.LocalRead")
               .Args(key)
