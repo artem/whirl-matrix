@@ -12,8 +12,7 @@ message(STATUS "FetchContent: whirl-frontend")
 
 FetchContent_Declare(
         whirl-frontend
-        GIT_REPOSITORY https://gitlab.com/Lipovsky/whirl.git
+        GIT_REPOSITORY https://gitlab.com/whirl-framework/whirl-frontend.git
         GIT_TAG master
 )
 FetchContent_MakeAvailable(whirl-frontend)
-
