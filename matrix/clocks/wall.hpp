@@ -17,13 +17,13 @@ class WallClock {
   }
 
   void AdjustOffset() {
-    offset_ = InitOffset();
     // This action does not affect active timers:
     // they rely on monotonic clock
+    offset_ = InitOffset();
   }
 
   node::time::WallTime Now() const {
-    return {GlobalNow() + offset_};
+    return GlobalNow() + offset_;
   }
 
  private:
