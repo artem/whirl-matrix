@@ -72,7 +72,7 @@ class EchoService : public commute::rpc::ServiceBase<EchoService> {
 
  protected:
   void RegisterMethods() override {
-    COMM_RPC_REGISTER_METHOD(Echo);
+    COMMUTE_RPC_REGISTER_METHOD(Echo);
   }
 
  private:

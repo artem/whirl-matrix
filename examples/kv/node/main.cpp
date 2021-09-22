@@ -94,8 +94,8 @@ class Coordinator : public commute::rpc::ServiceBase<Coordinator>, public node::
   }
 
   void RegisterMethods() override {
-    COMM_RPC_REGISTER_METHOD(Set);
-    COMM_RPC_REGISTER_METHOD(Get);
+    COMMUTE_RPC_REGISTER_METHOD(Set);
+    COMMUTE_RPC_REGISTER_METHOD(Get);
   };
 
   // RPC handlers
@@ -190,8 +190,8 @@ class Replica : public commute::rpc::ServiceBase<Replica> {
   }
 
   void RegisterMethods() override {
-    COMM_RPC_REGISTER_METHOD(LocalWrite);
-    COMM_RPC_REGISTER_METHOD(LocalRead);
+    COMMUTE_RPC_REGISTER_METHOD(LocalWrite);
+    COMMUTE_RPC_REGISTER_METHOD(LocalRead);
   };
 
   // RPC handlers
