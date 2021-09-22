@@ -83,7 +83,7 @@ bool Database::ReadCacheMiss() const {
 void Database::ReplayWAL() {
   mem_table_.Clear();
 
-  LOG_INFO("Replaying WAL");
+  LOG_INFO("Replaying WAL -> MemTable");
 
   if (!fs_->Exists(wal_path_)) {
     return;
@@ -95,7 +95,7 @@ void Database::ReplayWAL() {
     ApplyToMemTable(*batch);
   }
 
-  LOG_INFO("Mem table populated");
+  LOG_INFO("MemTable populated");
 }
 
 }  // namespace whirl::matrix::db
