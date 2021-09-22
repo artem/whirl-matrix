@@ -74,7 +74,7 @@ Use Attiya, Bar-Noy, Dolev (ABD) algorithm for linearizable behaviour:
 
 ```shell
 # Clone repo
-git clone https://gitlab.com/Lipovsky/whirl-matrix.git 
+git clone https://gitlab.com/whirl-framework/whirl-matrix.git 
 cd whirl-matrix
 # Generate build files
 mkdir build && cd build
