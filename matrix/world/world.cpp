@@ -66,8 +66,8 @@ void World::Start() {
   LOG_INFO("Starting adversaries...");
 
   // Start adversaries
-  for (auto& adv : adversaries_) {
-    Scope(adv)->Start();
+  for (auto& adversary : adversaries_) {
+    Scope(adversary)->Start();
   }
 
   LOG_INFO("World started");
@@ -118,14 +118,12 @@ size_t World::Stop() {
 
   // Adversaries
 
-  if (!adversaries_.empty()) {
-    for (auto& adv : adversaries_) {
-      Scope(adv)->Shutdown();
-    }
+  for (auto& adversary : adversaries_) {
+    Scope(adversary)->Shutdown();
   }
   adversaries_.clear();
 
-  LOG_INFO("Adversary stopped");
+  LOG_INFO("Adversaries stopped");
 
   // Network
 
