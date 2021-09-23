@@ -1,6 +1,4 @@
-#pragma once
-
-#include <matrix/time_model/time_model.hpp>
+#include <matrix/time_model/catalog/adversary.hpp>
 
 namespace whirl::matrix {
 
