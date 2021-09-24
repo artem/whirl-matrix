@@ -8,41 +8,43 @@
 
 #include <whirl/node/runtime/shortcuts.hpp>
 
+#include <cereal/types/string.hpp>
+
 #include <fmt/core.h>
+
+namespace kv {
 
 //////////////////////////////////////////////////////////////////////
 
 using Key = std::string;
-using Value = uint32_t;
+using Value = std::string;
 
 //////////////////////////////////////////////////////////////////////
 
-class KVBlockingClient {
+class BlockingClient {
  public:
-  explicit KVBlockingClient(commute::rpc::IChannelPtr channel)
-    : channel_(channel) {
+  explicit BlockingClient(commute::rpc::IChannelPtr channel)
+      : channel_(channel) {
   }
 
   void Set(Key key, Value value) {
-    await::fibers::Await(
-        commute::rpc::Call("KV.Set")  //
-          .Args(key, value)
-          .Via(channel_)
-          .TraceWith(GenerateTraceId("Set"))
-          .Start()
-          .As<void>())
-          .ThrowIfError();
+    await::fibers::Await(commute::rpc::Call("KV.Set")  //
+                             .Args(key, value)
+                             .Via(channel_)
+                             .TraceWith(GenerateTraceId("Set"))
+                             .Start()
+                             .As<void>())
+        .ThrowIfError();
   }
 
   Value Get(Key key) {
-    return await::fibers::Await(
-        commute::rpc::Call("KV.Get")  //
-          .Args(key)
-          .Via(channel_)
-          .TraceWith(GenerateTraceId("Get"))
-          .Start()
-          .As<Value>())
-          .ValueOrThrow();
+    return await::fibers::Await(commute::rpc::Call("KV.Get")  //
+                                    .Args(key)
+                                    .Via(channel_)
+                                    .TraceWith(GenerateTraceId("Get"))
+                                    .Start()
+                                    .As<Value>())
+        .ValueOrThrow();
   }
 
  private:
@@ -53,3 +55,5 @@ class KVBlockingClient {
  private:
   commute::rpc::IChannelPtr channel_;
 };
+
+}  // namespace kv
