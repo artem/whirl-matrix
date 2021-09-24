@@ -56,7 +56,7 @@ void TestRunner::RunSimulations(size_t count) {
 
   Report() << "Run " << count << " simulations..." << std::endl;
 
-  wheels::ProgressBar progress_bar("Progress", {false, '#', 50});
+  wheels::ProgressBar progress_bar("Progress", {false, '#', 50, false});
 
   if (!verbose_) {
     progress_bar.Start(count);
