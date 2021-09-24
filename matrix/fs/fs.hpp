@@ -79,7 +79,9 @@ class FileSystem {
 
   // Paths
 
-  std::string RootPath() const;
+  std::string_view RootPath() const;
+
+  std::string_view TmpPath() const;
 
   std::string PathAppend(const std::string& base_path,
                          const std::string& name) const;
