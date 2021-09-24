@@ -37,7 +37,7 @@ using namespace whirl;
 
 // Key -> Value
 using Key = std::string;
-using Value = uint32_t;
+using Value = std::string;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -48,8 +48,9 @@ struct WriteTimestamp {
     return {0};
   }
 
-  // Comparison
-  auto operator<=>(const WriteTimestamp& that) const = default;
+  bool operator<(const WriteTimestamp& that) const {
+      return value < that.value;
+  };
 
   // Serialization support (RPC, Database)
   MUESLI_SERIALIZABLE(value)
@@ -205,14 +206,14 @@ class Replica : public commute::rpc::ServiceBase<Replica> {
       Update(key, target_value);
     } else {
       // Write timestamp > timestamp of locally stored value
-      if (target_value.timestamp > local_value->timestamp) {
+      if (local_value->timestamp < target_value.timestamp) {
         Update(key, target_value);
       }
     }
   }
 
   StampedValue LocalRead(Key key) {
-    return kv_store_.GetOr(key, {0, WriteTimestamp::Min()});
+    return kv_store_.GetOr(key, {"", WriteTimestamp::Min()});
   }
 
  private:

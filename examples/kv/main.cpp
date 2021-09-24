@@ -45,10 +45,14 @@ using namespace whirl;
 
 //////////////////////////////////////////////////////////////////////
 
-static const std::vector<std::string> kKeys({"a", "b", "c"});
+static const std::vector<kv::Key> kKeys({"a", "b", "c"});
 
-const std::string& ChooseRandomKey() {
+kv::Key RandomKey() {
   return kKeys.at(node::rt::RandomNumber(matrix::GetGlobal<size_t>("keys")));
+}
+
+kv::Value RandomValue() {
+  return std::to_string(node::rt::RandomNumber(1, 100));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -63,19 +67,19 @@ const std::string& ChooseRandomKey() {
 
   timber::Logger logger_{"Client", node::rt::LoggerBackend()};
 
-  KVBlockingClient kv_store{matrix::client::MakeRpcChannel(
+  kv::BlockingClient kv_store{matrix::client::MakeRpcChannel(
       /*pool_name=*/"kv", /*port=*/42)};
 
   for (size_t i = 1;; ++i) {
-    Key key = ChooseRandomKey();
+    kv::Key key = RandomKey();
     if (matrix::client::Either()) {
-      Value value = node::rt::RandomNumber(1, 100);
+      kv::Value value = RandomValue();
       LOG_INFO("Execute Set({}, {})", key, value);
       kv_store.Set(key, value);
       LOG_INFO("Set completed");
     } else {
       LOG_INFO("Execute Get({})", key);
-      [[maybe_unused]] Value result = kv_store.Get(key);
+      [[maybe_unused]] kv::Value result = kv_store.Get(key);
       LOG_INFO("Get({}) -> {}", key, result);
     }
 
@@ -177,7 +181,7 @@ void NodeReeper() {
 
 // Sequential specification for KV storage
 // Used by linearizability checker
-using KVStoreModel = semantics::KVStoreModel<Key, Value>;
+using KVStoreModel = semantics::KVStoreModel<kv::Key, kv::Value>;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -296,7 +300,7 @@ size_t RunSimulation(size_t seed) {
     // History
     runner.Report() << "History is NOT LINEARIZABLE for seed = " << seed << ":"
                     << std::endl;
-    semantics::PrintKVHistory<Key, Value>(history, runner.Report());
+    semantics::PrintKVHistory<kv::Key, kv::Value>(history, runner.Report());
 
     runner.Fail();
   }
