@@ -67,7 +67,11 @@ class FS : public node::fs::IFileSystem {
   // Paths
 
   node::fs::Path RootPath() const override {
-    return {this, impl_->RootPath()};
+    return {this, std::string(impl_->RootPath())};
+  }
+
+  node::fs::Path TmpPath() const override {
+    return {this, std::string(impl_->TmpPath())};
   }
 
   std::string PathAppend(const std::string& base,

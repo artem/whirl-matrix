@@ -100,9 +100,14 @@ FileSystem::DirIterator FileSystem::ListAllFiles() {
   return {files_};
 }
 
-std::string FileSystem::RootPath() const {
-  // Allocate new string in userspace
+std::string_view FileSystem::RootPath() const {
+  // No allocations here!
   return "/";
+}
+
+std::string_view FileSystem::TmpPath() const {
+  // No allocations here!
+  return "/tmp";
 }
 
 std::string FileSystem::PathAppend(const std::string& base_path,
