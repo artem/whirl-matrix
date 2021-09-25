@@ -236,7 +236,7 @@ size_t RunSimulation(size_t seed) {
 
     if (random.Maybe(11)) {
       // Crashes
-      world.AddAdversary(NodeReeper);
+      world.AddAdversary(NodeReaper);
     }
   }
 
