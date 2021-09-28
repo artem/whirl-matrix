@@ -5,7 +5,7 @@ namespace whirl::matrix::cfg {
 std::string NodeConfig::GetString(std::string_view key) const {
   // This server
 
-  if (key == "pool") {
+  if (key == "pool.name" || key == "pool") {
     return server_.pool;
   }
 
