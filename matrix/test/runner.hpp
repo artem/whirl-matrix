@@ -85,6 +85,7 @@ class TestRunner {
   }
 
   void ResetLogFile();
+  void CheckLogPath(std::filesystem::path path);
   void WriteLogHeader();
 
   void Panic(const std::string& reason);

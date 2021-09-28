@@ -111,21 +111,19 @@ void TestRunner::Fail() {
   std::exit(1);
 }
 
-void TestRunner::ResetLogFile() {
-  auto path = *log_path_;
-
+void TestRunner::CheckLogPath(fs::path path) {
   if (!path.is_absolute()) {
-    Panic(fmt::format("Absolute log path expected: {}", path));
+    Panic(fmt::format("Absolute path expected: {}", path));
   }
 
   if (!path.has_parent_path()) {
-    Panic(fmt::format("Invalid log file path: {}", path));
+    Panic(fmt::format("No parent path: {}", path));
   }
 
-  auto parent_dir = path.parent_path();
+  const auto parent_dir = path.parent_path();
 
   if (!fs::exists(parent_dir)) {
-    Panic(fmt::format("Log directory does not exist: {}", path.parent_path()));
+    Panic(fmt::format("Directory does not exist: {}", parent_dir));
   }
 
   if (!fs::is_directory(parent_dir)) {
@@ -135,6 +133,12 @@ void TestRunner::ResetLogFile() {
   if (fs::exists(path) && !fs::is_regular_file(path)) {
     Panic(fmt::format("Regular file expected: {}", path));
   }
+}
+
+void TestRunner::ResetLogFile() {
+  auto path = *log_path_;
+
+  CheckLogPath(path);
 
   if (fs::exists(path)) {
     fs::resize_file(path, 0);
