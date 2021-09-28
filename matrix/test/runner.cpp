@@ -53,8 +53,8 @@ void TestRunner::TestDeterminism() {
   Report() << "Determinism test is OK" << std::endl;
 }
 
-void TestRunner::RunSimulations(size_t count) {
-  std::mt19937 seeds{42};
+void TestRunner::RunSimulations(size_t count, uint32_t seq_seed) {
+  std::mt19937 seeds{seq_seed};
 
   Report() << "Run " << count << " simulations..." << std::endl;
 

@@ -37,7 +37,7 @@ class TestRunner {
   // Run
 
   void TestDeterminism();
-  void RunSimulations(size_t count);
+  void RunSimulations(size_t count, uint32_t seq_seed = 42);
   void RunSingleSimulation(size_t seed);
 
   // Access current test runner
