@@ -87,6 +87,8 @@ class TestRunner {
   void ResetLogFile();
   void WriteLogHeader();
 
+  void Panic(const std::string& reason);
+
  private:
   Simulation sim_;
 

@@ -6,6 +6,8 @@
 
 #include <wheels/support/progress.hpp>
 
+#include <fmt/core.h>
+
 #include <random>
 #include <fstream>
 #include <filesystem>
@@ -112,9 +114,26 @@ void TestRunner::Fail() {
 void TestRunner::ResetLogFile() {
   auto path = *log_path_;
 
-  if (!fs::exists(path.parent_path())) {
-    WHEELS_PANIC(
-        "Log directory does not exist: " << path.parent_path());
+  if (!path.is_absolute()) {
+    Panic(fmt::format("Absolute log path expected: {}", path));
+  }
+
+  if (!path.has_parent_path()) {
+    Panic(fmt::format("Invalid log file path: {}", path));
+  }
+
+  auto parent_dir = path.parent_path();
+
+  if (!fs::exists(parent_dir)) {
+    Panic(fmt::format("Log directory does not exist: {}", path.parent_path()));
+  }
+
+  if (!fs::is_directory(parent_dir)) {
+    Panic(fmt::format("Parent path does not refer to a directory: {}", parent_dir));
+  }
+
+  if (fs::exists(path) && !fs::is_regular_file(path)) {
+    Panic(fmt::format("Regular file expected: {}", path));
   }
 
   if (fs::exists(path)) {
@@ -130,6 +149,11 @@ void TestRunner::WriteLogHeader() {
   std::ofstream log(*log_path_);
   log << "Whirl simulator log" << std::endl;
   log.close();
+}
+
+void TestRunner::Panic(const std::string& reason) {
+  std::cerr << "Whirl test runner FAILED: " << reason << std::endl;
+  std::exit(1);
 }
 
 }  // namespace whirl::matrix
