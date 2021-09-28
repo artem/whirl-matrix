@@ -2,7 +2,6 @@
 
 #include <commute/rpc/channel.hpp>
 #include <commute/rpc/errors.hpp>
-#include <commute/rpc/trace.hpp>
 
 #include <matrix/world/global/global.hpp>
 
@@ -32,7 +31,13 @@ class HistoryChannel : public IChannel {
 
   Future<Message> Call(const Method& method, const Message& input,
                        CallOptions options) override {
-    auto cookie = GetHistoryRecorder().CallStarted(method.name, input);
+    auto& recorder = GetHistoryRecorder();
+
+    auto cookie = recorder.CallStarted(method.name, input);
+
+    if (!options.trace_id.empty()) {
+      recorder.AddLabel(cookie, options.trace_id);
+    }
 
     auto f = impl_->Call(method, input, std::move(options));
 
@@ -46,10 +51,6 @@ class HistoryChannel : public IChannel {
  private:
   static void RecordCallResult(Cookie cookie, const Result<Message>& result) {
     auto& recorder = GetHistoryRecorder();
-
-    if (auto trace_id = TryGetCurrentTraceId()) {
-      recorder.AddLabel(cookie, *trace_id);
-    }
 
     if (result.IsOk()) {
       recorder.CallCompleted(cookie, result.ValueUnsafe());
