@@ -75,6 +75,10 @@ void Tracer::Deliver(const net::Frame& frame) {
   writer_.CloseMap();
 }
 
+static std::string Describe(commute::rpc::Method method) {
+  return method.service + "." + method.name;
+}
+
 void Tracer::WriteResponse(commute::rpc::proto::Response rsp) {
   writer_.WriteField("type");
   writer_.WriteString("commute::rpc::proto::Response");
@@ -82,10 +86,11 @@ void Tracer::WriteResponse(commute::rpc::proto::Response rsp) {
   writer_.WriteField("id");
   writer_.WriteInteger(rsp.request_id);
 
-  // TODO: trace id
+  writer_.WriteField("trace_id");
+  writer_.WriteString(rsp.trace_id);
 
   writer_.WriteField("method");
-  writer_.WriteString(rsp.method.service + "." + rsp.method.name);
+  writer_.WriteString(Describe(rsp.method));
 
   writer_.WriteField("error");
   writer_.WriteInteger((int)rsp.error);
@@ -106,7 +111,7 @@ void Tracer::WriteRequest(commute::rpc::proto::Request req) {
   writer_.WriteString(req.trace_id);
 
   writer_.WriteField("method");
-  writer_.WriteString(req.method.service + "." + req.method.name);
+  writer_.WriteString(Describe(req.method));
 
   // TODO: arguments
 }
