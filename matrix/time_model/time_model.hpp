@@ -64,6 +64,7 @@ struct ITimeModel {
   virtual Jiffies FlightTime(const net::IServer* start, const net::IServer* end,
                              const net::Packet& packet) = 0;
 
+  // Constant!
   virtual commute::rpc::BackoffParams BackoffParams() = 0;
 };
 
