@@ -66,6 +66,7 @@ void Tracer::Deliver(const net::Frame& frame) {
   writer_.WriteField("payload");
   writer_.OpenMap();
 
+  // Payload
   if (auto req = TryDeserialize<commute::rpc::proto::Request>(payload)) {
     WriteRequest(*req);
   } else if (auto rsp = TryDeserialize<commute::rpc::proto::Response>(payload)) {
@@ -73,14 +74,13 @@ void Tracer::Deliver(const net::Frame& frame) {
   } else {
     // ???
   }
+
   writer_.CloseMap();
 
   writer_.CloseMap();
 }
 
 void Tracer::WriteResponse(commute::rpc::proto::Response rsp) {
-  writer_.WriteField("payload");
-  writer_.OpenMap();
   writer_.WriteField("type");
   writer_.WriteString("commute::rpc::proto::Response");
 
@@ -98,13 +98,9 @@ void Tracer::WriteResponse(commute::rpc::proto::Response rsp) {
   if (rsp.IsOk()) {
     // TODO: result
   }
-
-  writer_.CloseMap();
 }
 
 void Tracer::WriteRequest(commute::rpc::proto::Request req) {
-  writer_.WriteField("payload");
-  writer_.OpenMap();
   writer_.WriteField("type");
   writer_.WriteString("commute::rpc::proto::Request");
 
@@ -118,8 +114,6 @@ void Tracer::WriteRequest(commute::rpc::proto::Request req) {
   writer_.WriteString(req.method.service + "." + req.method.name);
 
   // TODO: arguments
-
-  writer_.CloseMap();
 }
 
 void Tracer::Stop() {
