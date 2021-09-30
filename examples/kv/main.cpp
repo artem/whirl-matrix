@@ -240,11 +240,13 @@ size_t RunSimulation(size_t seed) {
     }
   }
 
-  // Log file
+  // Log / trace files
 
-  auto log_fpath = runner.LogFile();
-  if (log_fpath) {
-    world.WriteLogTo(*log_fpath);
+  if (auto path = runner.LogFile()) {
+    world.WriteLogTo(*path);
+  }
+  if (auto path = runner.TraceFile()) {
+    world.WriteTraceTo(*path);
   }
 
   // Globals

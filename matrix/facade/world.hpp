@@ -116,6 +116,8 @@ class World {
 
   void WriteLogTo(std::string fpath);
 
+  void WriteTraceTo(std::string fpath);
+
   void Start();
 
   bool Step();

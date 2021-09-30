@@ -78,7 +78,7 @@ class Network : public IActor, public fault::IFaultyNetwork {
   void Split(const fault::Partition& lhs) override;
   void Heal() override;
 
-  // Digest
+  // Misc
 
   size_t Digest() const {
     return digest_.GetValue();

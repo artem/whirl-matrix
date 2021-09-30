@@ -4,6 +4,8 @@
 
 #include <matrix/network/packet.hpp>
 #include <matrix/network/server.hpp>
+#include <matrix/network/frame.hpp>
+#include <matrix/trace/tracer.hpp>
 
 #include <matrix/helpers/priority_queue.hpp>
 
@@ -16,16 +18,16 @@ class Network;
 // One-way link
 class Link {
  private:
-  struct PacketEvent {
-    Packet packet;
+  struct FrameEvent {
+    Frame frame;
     TimePoint time;
 
-    bool operator<(const PacketEvent& that) const {
+    bool operator<(const FrameEvent& that) const {
       return time < that.time;
     }
   };
 
-  using PacketQueue = PriorityQueue<PacketEvent>;
+  using FrameQueue = PriorityQueue<FrameEvent>;
 
  public:
   Link(Network* net, IServer* start, IServer* end);
@@ -56,18 +58,18 @@ class Link {
     return paused_;
   }
 
-  bool HasPackets() const {
-    return !packets_.IsEmpty();
+  bool HasFrames() const {
+    return !frames_.IsEmpty();
   }
 
-  TimePoint NextPacketTime() const {
-    return packets_.Smallest().time;
+  TimePoint NextFrameTime() const {
+    return frames_.Smallest().time;
   }
 
-  Packet ExtractNextPacket();
+  Frame ExtractNextFrame();
 
   void Shutdown() {
-    packets_.Clear();
+    frames_.Clear();
   }
 
   // Faults
@@ -76,15 +78,18 @@ class Link {
   void Resume();
 
  private:
+  Frame MakeFrame(Packet packet);
+
   TimePoint ChooseDeliveryTime(const Packet& packet) const;
-  void Add(Packet&& packet, TimePoint delivery_time);
+
+  void Add(Frame frame, TimePoint delivery_time);
 
  private:
   Network* net_;
   IServer* start_;
   IServer* end_;
 
-  PacketQueue packets_;
+  FrameQueue frames_;
   bool paused_{false};
 
   Link* opposite_{nullptr};

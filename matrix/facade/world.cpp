@@ -49,6 +49,10 @@ void World::WriteLogTo(std::string fpath) {
   impl_->WriteLogTo(fpath);
 }
 
+void World::WriteTraceTo(std::string fpath) {
+  impl_->WriteTraceTo(fpath);
+}
+
 void World::Start() {
   impl_->Start();
 }

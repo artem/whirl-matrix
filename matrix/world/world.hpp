@@ -10,6 +10,7 @@
 #include <matrix/time_model/time_model.hpp>
 #include <matrix/history/recorder.hpp>
 #include <matrix/log/backend.hpp>
+#include <matrix/trace/impl/tracer.hpp>
 
 #include <matrix/time_model/catalog/adversary.hpp>
 
@@ -95,8 +96,12 @@ class World {
     time_model_ = std::move(time_model);
   }
 
-  void WriteLogTo(std::string fpath) {
+  void WriteLogTo(const std::string& fpath) {
     log_backend_.AppendToFile(fpath);
+  }
+
+  void WriteTraceTo(const std::string& fpath) {
+    tracer_.emplace(fpath);
   }
 
   IServerTimeModelPtr MakeServerTimeModel(const std::string& hostname) {
@@ -153,6 +158,14 @@ class World {
 
   HistoryRecorder& GetHistoryRecorder() {
     return history_recorder_;
+  }
+
+  ITracer* GetTracer() {
+    if (tracer_.has_value()) {
+      return &tracer_.value();
+    } else {
+      return nullptr;
+    }
   }
 
   // Context: Server
@@ -309,6 +322,8 @@ class World {
 
   DigestCalculator digest_;
   HistoryRecorder history_recorder_;
+
+  std::optional<Tracer> tracer_;
 
   UntypedDict globals_;
 

@@ -158,6 +158,10 @@ size_t World::Stop() {
 
   // Finalize
 
+  if (tracer_) {
+    tracer_->Stop();
+  }
+
   history_recorder_.Finalize();
 
   LOG_INFO("Simulation stopped");

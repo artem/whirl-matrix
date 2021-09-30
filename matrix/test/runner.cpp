@@ -135,10 +135,19 @@ void TestRunner::CheckLogPath(fs::path path) {
   }
 }
 
+void TestRunner::WriteLogTo(const std::string& path) {
+  CheckLogPath(path);
+  log_path_.emplace(path);
+  ResetLogFile();
+}
+
+void TestRunner::WriteTraceTo(const std::string& path) {
+  CheckLogPath(path);
+  trace_path_.emplace(path);
+}
+
 void TestRunner::ResetLogFile() {
   auto path = *log_path_;
-
-  CheckLogPath(path);
 
   if (fs::exists(path)) {
     fs::resize_file(path, 0);

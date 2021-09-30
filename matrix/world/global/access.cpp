@@ -62,6 +62,12 @@ HistoryRecorder& GetHistoryRecorder() {
 
 //////////////////////////////////////////////////////////////////////
 
+ITracer* GetTracer() {
+  return ThisWorld()->GetTracer();
+}
+
+//////////////////////////////////////////////////////////////////////
+
 std::vector<std::string> GetPool(const std::string& name) {
   return ThisWorld()->GetPool(name);
 }

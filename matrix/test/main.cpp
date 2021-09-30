@@ -15,6 +15,7 @@ static void CLI(wheels::ArgumentParser& parser) {
   parser.Add("sims").ValueDescr("uint").Optional().Help("Number of simulations to run");
   parser.Add("seed").ValueDescr("uint").Optional();
   parser.Add("log").ValueDescr("path").Optional();
+  parser.Add("trace").ValueDescr("path").Optional();
   parser.Add("quiet").Flag().Help("Be quiet");
 }
 
@@ -38,6 +39,9 @@ int Main(int argc, const char** argv, Simulation sim) {
 
   if (args.Has("log")) {
     runner.WriteLogTo(args.Get("log"));
+  }
+  if (args.Has("trace")) {
+    runner.WriteTraceTo(args.Get("trace"));
   }
 
   if (args.HasFlag("quiet")) {

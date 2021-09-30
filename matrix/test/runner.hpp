@@ -29,10 +29,9 @@ class TestRunner {
     verbose_ = false;
   }
 
-  void WriteLogTo(const std::string& path) {
-    log_path_.emplace(path);
-    ResetLogFile();
-  }
+  void WriteLogTo(const std::string& path);
+
+  void WriteTraceTo(const std::string& path);
 
   // Run
 
@@ -48,6 +47,10 @@ class TestRunner {
   std::optional<std::string> LogFile() const {
     return log_path_;
   };
+
+  std::optional<std::string> TraceFile() const {
+    return trace_path_;
+  }
 
   // Output streams
 
@@ -95,6 +98,7 @@ class TestRunner {
 
   bool verbose_{true};
   std::optional<std::filesystem::path> log_path_;
+  std::optional<std::filesystem::path> trace_path_;
 
   std::stringstream sink_;
 };

@@ -23,7 +23,12 @@ void Link::Add(Packet packet) {
     Address to{End()->HostName(), packet.header.dest_port};
     LOG_INFO("Send packet to {}: {}", to, log::FormatMessage(packet.message));
   }
-  Add(std::move(packet), ChooseDeliveryTime(packet));
+  Add(MakeFrame(packet), ChooseDeliveryTime(packet));
+}
+
+Frame Link::MakeFrame(Packet packet) {
+  return {{start_->HostName(), end_->HostName(), GlobalNow()},
+          std::move(packet)};
 }
 
 TimePoint Link::ChooseDeliveryTime(const Packet& packet) const {
@@ -34,9 +39,9 @@ TimePoint Link::ChooseDeliveryTime(const Packet& packet) const {
   return GlobalNow() + flight_time.Count();
 }
 
-Packet Link::ExtractNextPacket() {
+Frame Link::ExtractNextFrame() {
   WHEELS_VERIFY(!paused_, "Link is paused");
-  return packets_.Extract().packet;
+  return frames_.Extract().frame;
 }
 
 void Link::Pause() {
@@ -53,15 +58,15 @@ void Link::Resume() {
 
   auto now = GlobalNow();
 
-  if (!packets_.IsEmpty()) {
-    while (packets_.Smallest().time < now) {
-      Add(packets_.Extract().packet, now + 1);
+  if (!frames_.IsEmpty()) {
+    while (frames_.Smallest().time < now) {
+      Add(frames_.Extract().frame, now + 1);
     }
   }
 }
 
-void Link::Add(Packet&& packet, TimePoint delivery_time) {
-  packets_.Insert({packet, delivery_time});
+void Link::Add(Frame frame, TimePoint delivery_time) {
+  frames_.Insert({frame, delivery_time});
   net_->AddLinkEvent(this, delivery_time);
 }
 

@@ -1,7 +1,9 @@
 #include <matrix/network/network.hpp>
 
 #include <matrix/new/new.hpp>
+#include <matrix/world/global/time.hpp>
 #include <matrix/world/global/random.hpp>
+#include <matrix/world/global/trace.hpp>
 
 #include <timber/log.hpp>
 
@@ -10,7 +12,8 @@
 
 namespace whirl::matrix::net {
 
-Network::Network(timber::ILogBackend* log) : logger_("Network", log) {
+Network::Network(timber::ILogBackend* log)
+    : logger_("Network", log) {
 }
 
 void Network::AddServer(IServer* server) {
@@ -66,16 +69,21 @@ void Network::Step() {
     return;  // Skip this step
   }
 
-  WHEELS_VERIFY(link->HasPackets(), "Broken net");
-  WHEELS_VERIFY(link->NextPacketTime() == event.time, "Broken net");
+  WHEELS_VERIFY(link->HasFrames(), "Broken net");
+  WHEELS_VERIFY(link->NextFrameTime() == event.time, "Broken net");
 
-  Packet packet = link->ExtractNextPacket();
+  Frame frame = link->ExtractNextFrame();
+  auto packet = frame.packet;
 
   // ???
   // digest_.EatT(packet.message);
   digest_.Eat(packet.header.source_port)
       .Eat(packet.header.dest_port)
       .Eat(packet.message.length());
+
+  if (ITracer* tracer = GetTracer()) {
+    tracer->Deliver(frame);
+  }
 
   IServer* receiver = link->End();
   receiver->HandlePacket(packet, link->GetOpposite());
