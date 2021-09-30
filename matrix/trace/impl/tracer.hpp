@@ -2,11 +2,11 @@
 
 #include <matrix/trace/tracer.hpp>
 
-#include <matrix/helpers/json_writer.hpp>
-
 #include <matrix/network/frame.hpp>
 
-#include <commute/rpc/protocol.hpp>
+#include <matrix/helpers/json_writer.hpp>
+
+#include <commute/rpc/wire.hpp>
 
 #include <filesystem>
 
@@ -17,7 +17,7 @@ namespace whirl::matrix {
 
 class Tracer : public ITracer {
  public:
-  Tracer(const std::string& fpath);
+  Tracer(const std::string& path);
 
   void Deliver(const net::Frame& frame) override;
   void Stop() override;
