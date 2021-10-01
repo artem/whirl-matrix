@@ -43,7 +43,7 @@ void Tracer::Deliver(const net::Frame& frame) {
 
   writer_.OpenMap();
 
-  writer_.WriteField("type");
+  writer_.WriteField("event_type");
   writer_.WriteString("message");
 
   writer_.WriteField("source_host");
