@@ -1,5 +1,7 @@
 #include <matrix/test/runner.hpp>
 
+#include <matrix/facade/world.hpp>
+
 #include <matrix/new/debug.hpp>
 
 #include <wheels/support/assert.hpp>
@@ -78,6 +80,15 @@ void TestRunner::RunSimulations(size_t count, uint32_t seq_seed) {
 
   if (!verbose_) {
     progress_bar.Complete();
+  }
+}
+
+void TestRunner::Configure(facade::World& world) {
+  if (log_path_) {
+    world.WriteLogTo(*log_path_);
+  }
+  if (trace_path_) {
+    world.WriteTraceTo(*trace_path_);
   }
 }
 

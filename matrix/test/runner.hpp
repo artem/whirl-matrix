@@ -14,6 +14,12 @@
 
 namespace whirl::matrix {
 
+namespace facade {
+
+class World;
+
+}  // namespace facade
+
 class TestRunner {
  public:
   explicit TestRunner(Simulation sim) : sim_(sim) {
@@ -43,6 +49,8 @@ class TestRunner {
   static TestRunner& Access();
 
   // Options
+
+  void Configure(facade::World& world);
 
   std::optional<std::string> LogFile() const {
     return log_path_;

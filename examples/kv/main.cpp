@@ -212,6 +212,8 @@ size_t RunSimulation(size_t seed) {
 
   matrix::facade::World world{seed};
 
+  runner.Configure(world);
+
   // Time model
   world.SetTimeModel(matrix::MakeCrazyTimeModel());
 
@@ -238,15 +240,6 @@ size_t RunSimulation(size_t seed) {
       // Crashes
       world.AddAdversary(NodeReaper);
     }
-  }
-
-  // Log / trace files
-
-  if (auto path = runner.LogFile()) {
-    world.WriteLogTo(*path);
-  }
-  if (auto path = runner.TraceFile()) {
-    world.WriteTraceTo(*path);
   }
 
   // Globals
