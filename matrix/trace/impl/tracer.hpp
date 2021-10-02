@@ -4,9 +4,11 @@
 
 #include <matrix/network/frame.hpp>
 
-#include <matrix/helpers/json_writer.hpp>
-
 #include <commute/rpc/wire.hpp>
+
+// TODO
+#include <matrix/helpers/rapidjson.hpp>
+#include <cereal/external/rapidjson/prettywriter.h>
 
 #include <filesystem>
 
@@ -31,7 +33,8 @@ class Tracer : public ITracer {
 
  private:
   std::ofstream file_;
-  JsonWriter writer_;
+  OStreamAdapter file_adapter_;
+  rapidjson::PrettyWriter<OStreamAdapter> writer_;
 };
 
 }  // namespace whirl::matrix

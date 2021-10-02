@@ -4,7 +4,10 @@
 
 #include <matrix/log/bytes.hpp>
 
+#include <cereal/external/rapidjson/document.h>
+
 #include <muesli/serialize.hpp>
+#include <muesli/archives.hpp>
 
 namespace whirl::matrix {
 
@@ -21,9 +24,31 @@ std::optional<T> TryDeserialize(std::string payload) {
 
 //////////////////////////////////////////////////////////////////////
 
+template <typename JsonWriter>
+static void WriteJson(JsonWriter& writer, const std::string& json) {
+  rapidjson::Document doc;
+  doc.Parse(json.c_str());
+  doc.Accept(writer);
+}
+
+template <typename JsonWriter>
+static void WriteMessage(JsonWriter& writer, const std::string& message) {
+  if (muesli::archives::IsBinaryFormat()) {
+    writer.String("<binary>");
+  } else {
+    WriteJson(writer, message);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+
 Tracer::Tracer(const std::string& path)
-    : file_(path, std::ofstream::out), writer_(file_) {
-  writer_.OpenList();
+    : file_(path),
+      file_adapter_(file_),
+      writer_(file_adapter_) {
+
+  writer_.SetIndent(' ', 2);
+  writer_.StartArray();
 }
 
 bool Tracer::IsData(const net::Frame& frame) const {
@@ -41,25 +66,25 @@ void Tracer::Deliver(const net::Frame& frame) {
 
   auto payload = frame.packet.message;
 
-  writer_.OpenMap();
+  writer_.StartObject();
 
-  writer_.WriteField("event_type");
-  writer_.WriteString("message");
+  writer_.Key("event_type");
+  writer_.String("message");
 
-  writer_.WriteField("source_host");
-  writer_.WriteString(frame.header.source_host);
+  writer_.Key("source_host");
+  writer_.String(frame.header.source_host.c_str());
 
-  writer_.WriteField("dest_host");
-  writer_.WriteString(frame.header.dest_host);
+  writer_.Key("dest_host");
+  writer_.String(frame.header.dest_host.c_str());
 
-  writer_.WriteField("send_time");
-  writer_.WriteInteger(frame.header.send_time);
+  writer_.Key("send_time");
+  writer_.Int(frame.header.send_time);
 
-  writer_.WriteField("receive_time");
-  writer_.WriteInteger(receive_time);
+  writer_.Key("receive_time");
+  writer_.Int(receive_time);
 
-  writer_.WriteField("payload");
-  writer_.OpenMap();
+  writer_.Key("payload");
+  writer_.StartObject();
 
   // Payload
   if (auto req = TryDeserialize<commute::rpc::proto::Request>(payload)) {
@@ -70,9 +95,9 @@ void Tracer::Deliver(const net::Frame& frame) {
     // ???
   }
 
-  writer_.CloseMap();
+  writer_.EndObject();
 
-  writer_.CloseMap();
+  writer_.EndObject();
 }
 
 static std::string Describe(commute::rpc::Method method) {
@@ -80,44 +105,46 @@ static std::string Describe(commute::rpc::Method method) {
 }
 
 void Tracer::WriteResponse(commute::rpc::proto::Response rsp) {
-  writer_.WriteField("type");
-  writer_.WriteString("commute::rpc::proto::Response");
+  writer_.Key("type");
+  writer_.String("commute::rpc::proto::Response");
 
-  writer_.WriteField("id");
-  writer_.WriteInteger(rsp.request_id);
+  writer_.Key("id");
+  writer_.Int(rsp.request_id);
 
-  writer_.WriteField("trace_id");
-  writer_.WriteString(rsp.trace_id);
+  writer_.Key("trace_id");
+  writer_.String(rsp.trace_id.c_str());
 
-  writer_.WriteField("method");
-  writer_.WriteString(Describe(rsp.method));
+  writer_.Key("method");
+  writer_.String(Describe(rsp.method).c_str());
 
-  writer_.WriteField("error");
-  writer_.WriteInteger((int)rsp.error);
+  writer_.Key("error");
+  writer_.Int((int)rsp.error);
 
   if (rsp.IsOk()) {
-    // TODO: result
+    writer_.Key("result");
+    WriteMessage(writer_, rsp.result);
   }
 }
 
 void Tracer::WriteRequest(commute::rpc::proto::Request req) {
-  writer_.WriteField("type");
-  writer_.WriteString("commute::rpc::proto::Request");
+  writer_.Key("type");
+  writer_.String("commute::rpc::proto::Request");
 
-  writer_.WriteField("id");
-  writer_.WriteInteger(req.id);
+  writer_.Key("id");
+  writer_.Int(req.id);
 
-  writer_.WriteField("trace_id");
-  writer_.WriteString(req.trace_id);
+  writer_.Key("trace_id");
+  writer_.String(req.trace_id.c_str());
 
-  writer_.WriteField("method");
-  writer_.WriteString(Describe(req.method));
+  writer_.Key("method");
+  writer_.String(Describe(req.method).c_str());
 
-  // TODO: arguments
+  writer_.Key("arguments");
+  WriteMessage(writer_, req.input);
 }
 
 void Tracer::Stop() {
-  writer_.CloseList();
+  writer_.EndArray();
   file_ << std::endl;
   file_.flush();
 }
