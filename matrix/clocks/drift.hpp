@@ -25,7 +25,11 @@ class Drift {
   // For sleeps/timeouts
   // User duration -> real time duration
   Jiffies SleepOrTimeout(Jiffies user) const {
-    return (user.Count() * 100) / (100 + drift_);
+    if (user.Count() == 0) {
+      return 0;
+    }
+    uint64_t real = (user.Count() * 100) / (100 + drift_);
+    return std::max<uint64_t>(real, 1);
   }
 
  private:

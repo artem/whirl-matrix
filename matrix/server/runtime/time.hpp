@@ -34,7 +34,7 @@ class TimeService : public node::time::ITimeService {
 
   await::futures::Future<void> AfterJiffies(await::time::Jiffies d) override {
     // NB: await::time::Jiffies = whirl::Jiffies
-    auto after = AfterGlobalTime(d);
+    auto after = AfterRealTime(d);
 
     auto [f, p] = await::futures::MakeContract<void>();
 
@@ -46,8 +46,12 @@ class TimeService : public node::time::ITimeService {
   }
 
  private:
-  TimePoint AfterGlobalTime(Jiffies d) const {
-    return GlobalNow() + monotonic_clock_.SleepOrTimeout(d).Count();
+  Jiffies ToRealTimeDelay(Jiffies delay) const {
+    return monotonic_clock_.SleepOrTimeout(delay);
+  }
+
+  TimePoint AfterRealTime(Jiffies delay) const {
+    return GlobalNow() + ToRealTimeDelay(delay).Count();
   }
 
  private:

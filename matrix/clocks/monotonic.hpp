@@ -28,8 +28,8 @@ class MonotonicClock {
   }
 
   // For timeouts and sleeps
-  Jiffies SleepOrTimeout(Jiffies d) const {
-    return drift_.SleepOrTimeout(d);
+  Jiffies SleepOrTimeout(Jiffies delay) const {
+    return drift_.SleepOrTimeout(delay);
   }
 
  private:
