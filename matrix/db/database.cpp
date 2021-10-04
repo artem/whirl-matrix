@@ -20,9 +20,9 @@ Database::Database(node::fs::IFileSystem* fs)
 }
 
 void Database::Open(const std::string& directory) {
-  wal_path_ = directory + "/wal";
-  wal_.emplace(fs_, wal_path_);
-  ReplayWAL();
+  auto wal_path = fs_->MakePath(directory) / "wal";
+  wal_.emplace(fs_, wal_path);
+  ReplayWAL(wal_path);
 }
 
 void Database::Put(const Key& key, const Value& value) {
@@ -88,18 +88,18 @@ bool Database::ReadCacheMiss() const {
   return false;
 }
 
-void Database::ReplayWAL() {
+void Database::ReplayWAL(node::fs::Path wal_path) {
   mem_table_.Clear();
 
   LOG_INFO("Replaying WAL -> MemTable");
 
-  if (!fs_->Exists(wal_path_)) {
+  if (!fs_->Exists(wal_path)) {
     return;
   }
 
   version_ = 0;
 
-  WALReader wal_reader(fs_, wal_path_);
+  WALReader wal_reader(fs_, wal_path);
 
   while (auto batch = wal_reader.ReadNext()) {
     ApplyToMemTable(*batch);

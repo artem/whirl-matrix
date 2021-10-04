@@ -66,6 +66,10 @@ class FS : public node::fs::IFileSystem {
 
   // Paths
 
+  node::fs::Path MakePath(std::string_view repr) const override {
+    return {this, std::string{repr}};
+  }
+
   node::fs::Path RootPath() const override {
     return {this, std::string(impl_->RootPath())};
   }

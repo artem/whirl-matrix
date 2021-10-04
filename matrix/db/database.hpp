@@ -40,14 +40,12 @@ class Database : public node::db::IDatabase {
   void DoWrite(node::db::WriteBatch& batch);
   void ApplyToMemTable(const node::db::WriteBatch& batch);
 
-  void ReplayWAL();
+  void ReplayWAL(node::fs::Path wal_path);
 
   bool ReadCacheMiss() const;
 
  private:
   node::fs::IFileSystem* fs_;
-
-  std::string wal_path_;
 
   MemTable mem_table_;
   std::optional<WALWriter> wal_;
