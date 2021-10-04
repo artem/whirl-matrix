@@ -17,8 +17,10 @@ namespace whirl::matrix::db {
 // Implemented in userspace
 
 class Database : public node::db::IDatabase {
+  friend class Iterator;
+
  public:
-  Database(node::fs::IFileSystem* fs);
+  explicit Database(node::fs::IFileSystem* fs);
 
   void Open(const std::string& directory) override;
 
@@ -42,7 +44,12 @@ class Database : public node::db::IDatabase {
 
   void ReplayWAL(node::fs::Path wal_path);
 
+  void IteratorMove();
+
   bool ReadCacheMiss() const;
+
+  // Emulate read latency
+  void ReadFromSSTable();
 
  private:
   node::fs::IFileSystem* fs_;

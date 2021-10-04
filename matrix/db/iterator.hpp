@@ -10,7 +10,7 @@ namespace whirl::matrix::db {
 
 class Iterator : public node::db::IIterator {
  public:
-  explicit Iterator(SnapshotPtr snapshot);
+  Iterator(SnapshotRef snapshot);
 
   // IIterator
 
@@ -29,8 +29,11 @@ class Iterator : public node::db::IIterator {
  private:
   void EnsureValid() const;
 
+  // Access new key
+  void Move();
+
  private:
-  SnapshotPtr snapshot_;
+  SnapshotRef snapshot_;
 
   const Entries& entries_;
 

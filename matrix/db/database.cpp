@@ -42,17 +42,25 @@ void Database::Delete(const Key& key) {
 }
 
 std::optional<Value> Database::TryGet(const Key& key) const {
-  if (ReadCacheMiss()) {
-    // TODO
-    // disk_.Read(1);  // Access SSTable-s
-  }
   LOG_INFO("TryGet({})", key);
+
+  if (ReadCacheMiss()) {
+    // ReadFromSSTable();
+  }
   return mem_table_.TryGet(key);
+}
+
+void Database::IteratorMove() {
+  // ReadFromSSTable();
+}
+
+void Database::ReadFromSSTable() {
+  // TODO
 }
 
 node::db::ISnapshotPtr Database::MakeSnapshot() {
   LOG_INFO("Make snapshot at version {}", version_);
-  return std::make_shared<Snapshot>(mem_table_.GetEntries(), version_);
+  return std::make_shared<Snapshot>(this, mem_table_.GetEntries(), version_);
 }
 
 void Database::Write(WriteBatch batch) {

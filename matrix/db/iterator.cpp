@@ -1,10 +1,12 @@
 #include <matrix/db/iterator.hpp>
 
+#include <matrix/db/database.hpp>
+
 #include <wheels/support/assert.hpp>
 
 namespace whirl::matrix::db {
 
-Iterator::Iterator(SnapshotPtr snapshot)
+Iterator::Iterator(SnapshotRef snapshot)
   : snapshot_(snapshot),
     entries_(snapshot->GetEntries()) {
   SeekToFirst();
@@ -56,18 +58,25 @@ bool Iterator::Valid() const {
 void Iterator::Next() {
   EnsureValid();
   ++it_;
-  if (it_ == entries_.end()) {
+  if (it_ != entries_.end()) {
+    Move();
+  } else {
     valid_ = false;
   }
 }
 
 void Iterator::Prev() {
   EnsureValid();
-  if (it_ == entries_.begin()) {
-    valid_ = false;
-  } else {
+  if (it_ != entries_.begin()) {
     --it_;
+    Move();
+  } else {
+    valid_ = false;
   }
+}
+
+void Iterator::Move() {
+  snapshot_->Db()->IteratorMove();
 }
 
 void Iterator::EnsureValid() const {

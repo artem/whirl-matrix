@@ -6,11 +6,14 @@
 
 namespace whirl::matrix::db {
 
+class Database;
+
 class Snapshot : public node::db::ISnapshot,
                  public std::enable_shared_from_this<Snapshot> {
  public:
-  explicit Snapshot(Entries entries, uint64_t version)
-      : entries_(std::move(entries))
+  Snapshot(Database* db, Entries entries, uint64_t version)
+      : db_(db),
+        entries_(std::move(entries))
       , version_(version) {
   }
 
@@ -31,11 +34,16 @@ class Snapshot : public node::db::ISnapshot,
     return version_;
   }
 
+  Database* Db() {
+    return db_;
+  }
+
  private:
+  Database* db_;
   const Entries entries_;
   uint64_t version_;
 };
 
-using SnapshotPtr = std::shared_ptr<Snapshot>;
+using SnapshotRef = std::shared_ptr<Snapshot>;
 
 }  // namespace whirl::matrix::db
