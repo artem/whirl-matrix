@@ -1,5 +1,7 @@
 #include <matrix/db/database.hpp>
 
+#include <matrix/db/snapshot.hpp>
+
 #include <matrix/world/global/random.hpp>
 #include <matrix/world/global/log.hpp>
 
@@ -18,13 +20,13 @@ Database::Database(node::fs::IFileSystem* fs)
 }
 
 void Database::Open(const std::string& directory) {
-  wal_path_ = directory + "/wal";
-  wal_.emplace(fs_, wal_path_);
-  ReplayWAL();
+  auto wal_path = fs_->MakePath(directory) / "wal";
+  wal_.emplace(fs_, wal_path);
+  ReplayWAL(wal_path);
 }
 
 void Database::Put(const Key& key, const Value& value) {
-  LOG_INFO("Put('{}', '{}')", key, log::FormatMessage(value));
+  //LOG_INFO("Put('{}', '{}')", key, log::FormatMessage(value));
 
   node::db::WriteBatch batch;
   batch.Put(key, value);
@@ -32,11 +34,11 @@ void Database::Put(const Key& key, const Value& value) {
 }
 
 void Database::Delete(const Key& key) {
-  LOG_INFO("Delete('{}')", key);
+  //LOG_INFO("Delete('{}')", key);
 
   node::db::WriteBatch batch;
   batch.Delete(key);
-  Write(batch);
+  DoWrite(batch);
 }
 
 std::optional<Value> Database::TryGet(const Key& key) const {
@@ -46,6 +48,11 @@ std::optional<Value> Database::TryGet(const Key& key) const {
   }
   LOG_INFO("TryGet({})", key);
   return mem_table_.TryGet(key);
+}
+
+node::db::ISnapshotPtr Database::MakeSnapshot() {
+  LOG_INFO("Make snapshot at version {}", version_);
+  return std::make_shared<Snapshot>(mem_table_.GetEntries(), version_);
 }
 
 void Database::Write(WriteBatch batch) {
@@ -58,6 +65,7 @@ void Database::DoWrite(WriteBatch& batch) {
 
   wal_->Append(batch);
   ApplyToMemTable(batch);
+  ++version_;
 }
 
 void Database::ApplyToMemTable(const node::db::WriteBatch& batch) {
@@ -80,19 +88,22 @@ bool Database::ReadCacheMiss() const {
   return false;
 }
 
-void Database::ReplayWAL() {
+void Database::ReplayWAL(node::fs::Path wal_path) {
   mem_table_.Clear();
 
   LOG_INFO("Replaying WAL -> MemTable");
 
-  if (!fs_->Exists(wal_path_)) {
+  if (!fs_->Exists(wal_path)) {
     return;
   }
 
-  WALReader wal_reader(fs_, wal_path_);
+  version_ = 0;
+
+  WALReader wal_reader(fs_, wal_path);
 
   while (auto batch = wal_reader.ReadNext()) {
     ApplyToMemTable(*batch);
+    ++version_;
   }
 
   LOG_INFO("MemTable populated");
