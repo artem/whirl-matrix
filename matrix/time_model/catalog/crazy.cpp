@@ -50,6 +50,16 @@ class CrazyServerTimeModel : public IServerTimeModel {
     return GlobalRandomNumber(10, 50);
   }
 
+  // Database
+
+  bool GetCacheMiss() override {
+    return GlobalRandomNumber(3) == 0;
+  }
+
+  bool IteratorCacheMiss() override {
+    return GlobalRandomNumber(11) == 0;
+  }
+
   // Threads
 
   Jiffies ThreadPause() override {

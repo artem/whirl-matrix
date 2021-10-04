@@ -4,8 +4,11 @@
 
 #include <matrix/world/global/random.hpp>
 #include <matrix/world/global/log.hpp>
+#include <matrix/world/global/time_model.hpp>
 
 #include <matrix/log/bytes.hpp>
+
+#include <wheels/memory/view_of.hpp>
 
 #include <timber/log.hpp>
 
@@ -16,13 +19,18 @@ using whirl::node::db::WriteBatch;
 namespace whirl::matrix::db {
 
 Database::Database(node::fs::IFileSystem* fs)
-    : fs_(fs), logger_("Database", GetLogBackend()) {
+    : fs_(fs),
+      logger_("Database", GetLogBackend()) {
 }
 
 void Database::Open(const std::string& directory) {
-  auto wal_path = fs_->MakePath(directory) / "wal";
+  dir_ = fs_->MakePath(directory);
+
+  auto wal_path = LogPath();
   wal_.emplace(fs_, wal_path);
   ReplayWAL(wal_path);
+
+  PrepareSSTable();
 }
 
 void Database::Put(const Key& key, const Value& value) {
@@ -44,18 +52,16 @@ void Database::Delete(const Key& key) {
 std::optional<Value> Database::TryGet(const Key& key) const {
   LOG_INFO("TryGet({})", key);
 
-  if (ReadCacheMiss()) {
-    // ReadFromSSTable();
+  if (ThisServerTimeModel()->GetCacheMiss()) {
+    AccessSSTable();
   }
   return mem_table_.TryGet(key);
 }
 
 void Database::IteratorMove() {
-  // ReadFromSSTable();
-}
-
-void Database::ReadFromSSTable() {
-  // TODO
+  if (ThisServerTimeModel()->IteratorCacheMiss()) {
+    AccessSSTable();
+  }
 }
 
 node::db::ISnapshotPtr Database::MakeSnapshot() {
@@ -91,11 +97,6 @@ void Database::ApplyToMemTable(const node::db::WriteBatch& batch) {
   }
 }
 
-bool Database::ReadCacheMiss() const {
-  // return GlobalRandomNumber(10) == 1;  // Move to time model?
-  return false;
-}
-
 void Database::ReplayWAL(node::fs::Path wal_path) {
   mem_table_.Clear();
 
@@ -116,5 +117,25 @@ void Database::ReplayWAL(node::fs::Path wal_path) {
 
   LOG_INFO("MemTable populated");
 }
+
+// Emulate read latency
+
+void Database::PrepareSSTable() {
+  auto sstable_path = SSTablePath();
+  if (!fs_->Exists(sstable_path)) {
+    fs_->Create(sstable_path).ExpectOk();
+
+    node::fs::FileWriter writer(fs_, sstable_path);
+    writer.Write(wheels::ViewOf("data"));
+  }
+}
+
+void Database::AccessSSTable() const {
+  LOG_INFO("Cache miss, access SSTable on disk");
+  node::fs::FileReader reader(SSTablePath());
+  char buf[128];
+  reader.ReadSome(wheels::MutViewOf(buf));
+}
+
 
 }  // namespace whirl::matrix::db

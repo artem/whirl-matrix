@@ -46,13 +46,23 @@ class Database : public node::db::IDatabase {
 
   void IteratorMove();
 
-  bool ReadCacheMiss() const;
+  node::fs::Path LogPath() const {
+    return *dir_ / "wal";
+  }
 
   // Emulate read latency
-  void ReadFromSSTable();
+
+  node::fs::Path SSTablePath() const {
+    return *dir_ / "sstable";
+  }
+
+  void AccessSSTable() const;
+  void PrepareSSTable();
 
  private:
   node::fs::IFileSystem* fs_;
+
+  std::optional<node::fs::Path> dir_;
 
   MemTable mem_table_;
   std::optional<WALWriter> wal_;
