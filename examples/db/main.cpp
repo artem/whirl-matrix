@@ -1,14 +1,10 @@
-#include <whirl/node/db/kv.hpp>
-#include <whirl/node/fs/io.hpp>
+#include <whirl/node/db/database.hpp>
 
 #include <whirl/node/runtime/shortcuts.hpp>
 
 // Simulation
 #include <matrix/facade/world.hpp>
 #include <matrix/test/event_log.hpp>
-
-#include <wheels/memory/view_of.hpp>
-#include <wheels/io/read.hpp>
 
 #include <chrono>
 
@@ -27,7 +23,7 @@ void PrintSnapshot(std::string_view title, node::db::ISnapshotPtr snapshot) {
   }
 }
 
-void TestNode() {
+void NodeMain() {
   node::rt::Database()->Open(
       node::rt::Config()->GetString("db.path"));
 
@@ -85,7 +81,7 @@ int main() {
 
   static const std::string kHostName = "Mars";
 
-  world.AddServer(kHostName, TestNode);
+  world.AddServer(kHostName, NodeMain);
 
   world.Start();
   world.MakeSteps(100);
