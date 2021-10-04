@@ -52,7 +52,7 @@ std::optional<Value> Database::TryGet(const Key& key) const {
 
 node::db::ISnapshotPtr Database::MakeSnapshot() {
   LOG_INFO("Make snapshot at version {}", version_);
-  return std::make_shared<Snapshot>(mem_table_.GetEntries());
+  return std::make_shared<Snapshot>(mem_table_.GetEntries(), version_);
 }
 
 void Database::Write(WriteBatch batch) {

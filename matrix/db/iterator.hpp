@@ -10,11 +10,9 @@ namespace whirl::matrix::db {
 
 class Iterator : public node::db::IIterator {
  public:
-  Iterator(node::db::ISnapshotPtr snapshot, const Entries& entries)
-      : snapshot_(std::move(snapshot)),
-        entries_(entries) {
-    SeekToFirst();
-  }
+  explicit Iterator(SnapshotPtr snapshot);
+
+  // IIterator
 
   node::db::KeyView Key() const override;
   node::db::ValueView Value() const override;
@@ -32,7 +30,7 @@ class Iterator : public node::db::IIterator {
   void EnsureValid() const;
 
  private:
-  node::db::ISnapshotPtr snapshot_;
+  SnapshotPtr snapshot_;
 
   const Entries& entries_;
 

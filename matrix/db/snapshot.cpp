@@ -16,7 +16,7 @@ std::optional<node::db::Value> Snapshot::TryGet(
 
 node::db::IIteratorPtr Snapshot::MakeIterator() {
   auto self = shared_from_this();
-  return std::make_shared<Iterator>(self, entries_);
+  return std::make_shared<Iterator>(self);
 }
 
 }  // namespace whirl::matrix::db

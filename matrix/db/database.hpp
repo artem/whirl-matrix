@@ -52,7 +52,7 @@ class Database : public node::db::IDatabase {
   await::fibers::Mutex write_mutex_;
 
   // Incremented on each (batch) mutation
-  size_t version_ = 0;
+  uint64_t version_ = 0;
 
   mutable timber::Logger logger_;
 };

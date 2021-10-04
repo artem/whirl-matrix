@@ -4,6 +4,12 @@
 
 namespace whirl::matrix::db {
 
+Iterator::Iterator(SnapshotPtr snapshot)
+  : snapshot_(snapshot),
+    entries_(snapshot->GetEntries()) {
+  SeekToFirst();
+}
+
 node::db::KeyView Iterator::Key() const {
   EnsureValid();
   return it_->first;
