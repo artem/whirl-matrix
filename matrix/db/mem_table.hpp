@@ -2,6 +2,8 @@
 
 #include <matrix/db/entries.hpp>
 
+#include <optional>
+
 namespace whirl::matrix::db {
 
 // Sorted in-memory string -> string mapping
