@@ -6,8 +6,6 @@
 #include <matrix/db/entries.hpp>
 #include <matrix/db/snapshot.hpp>
 
-#include <wheels/support/assert.hpp>
-
 namespace whirl::matrix::db {
 
 class Iterator : public node::db::IIterator {
@@ -18,70 +16,20 @@ class Iterator : public node::db::IIterator {
     SeekToFirst();
   }
 
-  node::db::KeyView Key() const override {
-    CheckValid();
-    return it_->first;
-  }
+  node::db::KeyView Key() const override;
+  node::db::ValueView Value() const override;
 
-  node::db::ValueView Value() const override {
-    CheckValid();
-    return it_->second;
-  }
+  void SeekToFirst() override;
+  void SeekToLast() override;
+  void Seek(const node::db::Key& target) override;
 
-  void SeekToFirst() override {
-    if (entries_.empty()) {
-      valid_ = false;
-      return;
-    }
+  bool Valid() const override;
 
-    valid_ = true;
-    it_ = entries_.begin();
-  }
-
-  void SeekToLast() override {
-    if (entries_.empty()) {
-      valid_ = false;
-      return;
-    }
-
-    valid_ = true;
-    it_ = std::prev(entries_.end());
-  }
-
-  void Seek(const node::db::Key& target) override {
-    it_ = entries_.lower_bound(target);
-    if (it_ != entries_.end()) {
-      valid_ = true;
-    } else {
-      valid_ = false;
-    }
-  }
-
-  bool Valid() const override {
-    return valid_;
-  }
-
-  void Next() override {
-    CheckValid();
-    ++it_;
-    if (it_ == entries_.end()) {
-      valid_ = false;
-    }
-  }
-
-  void Prev() override {
-    CheckValid();
-    if (it_ == entries_.begin()) {
-      valid_ = false;
-    } else {
-      --it_;
-    }
-  }
+  void Next() override;
+  void Prev() override;
 
  private:
-  void CheckValid() const {
-    WHEELS_VERIFY(valid_, "Invalid iterator");
-  }
+  void EnsureValid() const;
 
  private:
   node::db::ISnapshotPtr snapshot_;
