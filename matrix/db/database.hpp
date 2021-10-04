@@ -22,14 +22,19 @@ class Database : public node::db::IDatabase {
 
   void Open(const std::string& directory) override;
 
-  void Put(const node::db::Key& key, const node::db::Value& value) override;
+  // Mutate
 
+  void Put(const node::db::Key& key, const node::db::Value& value) override;
   void Delete(const node::db::Key& key) override;
+
+  void Write(node::db::WriteBatch batch) override;
+
+  // Read
 
   std::optional<node::db::Value> TryGet(
       const node::db::Key& key) const override;
 
-  void Write(node::db::WriteBatch batch) override;
+  node::db::ISnapshotPtr MakeSnapshot() override;
 
  private:
   void DoWrite(node::db::WriteBatch& batch);
@@ -47,6 +52,9 @@ class Database : public node::db::IDatabase {
   MemTable mem_table_;
   std::optional<WALWriter> wal_;
   await::fibers::Mutex write_mutex_;
+
+  // Incremented on each (batch) mutation
+  size_t version_ = 0;
 
   mutable timber::Logger logger_;
 };

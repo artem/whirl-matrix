@@ -1,8 +1,6 @@
 #pragma once
 
-#include <whirl/node/db/kv.hpp>
-
-#include <map>
+#include <matrix/db/entries.hpp>
 
 namespace whirl::matrix::db {
 
@@ -33,8 +31,12 @@ class MemTable {
     entries_.clear();
   }
 
+  const Entries& GetEntries() const {
+    return entries_;
+  }
+
  private:
-  std::map<node::db::Key, node::db::Value> entries_;
+  Entries entries_;
 };
 
 }  // namespace whirl::matrix::db
