@@ -13,7 +13,10 @@ class Snapshot : public node::db::ISnapshot,
       : entries_(std::move(entries)) {
   }
 
-  node::db::IIteratorPtr MakeIterator();
+  std::optional<node::db::Value> TryGet(
+      const node::db::Key& key) const override;
+
+  node::db::IIteratorPtr MakeIterator() override;
 
  private:
   const Entries entries_;

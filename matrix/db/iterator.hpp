@@ -18,7 +18,7 @@ class Iterator : public node::db::IIterator {
     SeekToFirst();
   }
 
-  node::db::Key Key() const override {
+  node::db::KeyView Key() const override {
     CheckValid();
     return it_->first;
   }
