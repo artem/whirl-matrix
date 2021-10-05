@@ -30,6 +30,7 @@ void Iterator::SeekToFirst() {
 
   valid_ = true;
   it_ = entries_.begin();
+  Move();
 }
 
 void Iterator::SeekToLast() {
@@ -40,12 +41,14 @@ void Iterator::SeekToLast() {
 
   valid_ = true;
   it_ = std::prev(entries_.end());
+  Move();
 }
 
 void Iterator::Seek(const node::db::Key& target) {
   it_ = entries_.lower_bound(target);
   if (it_ != entries_.end()) {
     valid_ = true;
+    Move();
   } else {
     valid_ = false;
   }
