@@ -147,7 +147,7 @@ void Tracer::WriteRequest(commute::rpc::proto::Request req) {
   WriteMessage(writer_, req.input);
 }
 
-void Tracer::Stop() {
+void Tracer::Finalize() {
   writer_.EndArray();
   file_ << std::endl;
   file_.flush();

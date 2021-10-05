@@ -22,7 +22,8 @@ class Tracer : public ITracer {
   Tracer(const std::string& path);
 
   void Deliver(const net::Frame& frame) override;
-  void Stop() override;
+
+  void Finalize() override;
 
  private:
   bool IsData(const net::Frame& frame) const;
