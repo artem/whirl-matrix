@@ -10,7 +10,7 @@ namespace whirl::matrix::db {
 
 class Iterator : public node::db::IIterator {
  public:
-  Iterator(SnapshotRef snapshot);
+  explicit Iterator(SnapshotRef snapshot);
 
   // IIterator
 
@@ -37,7 +37,7 @@ class Iterator : public node::db::IIterator {
 
   const Entries& entries_;
 
-  bool valid_ = true;
+  bool valid_ = false;
   Entries::const_iterator it_;
 };
 
