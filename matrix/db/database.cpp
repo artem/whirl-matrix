@@ -137,5 +137,4 @@ void Database::AccessSSTable() const {
   reader.ReadSome(wheels::MutViewOf(buf));
 }
 
-
 }  // namespace whirl::matrix::db
