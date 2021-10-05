@@ -5,7 +5,6 @@
 #include <matrix/new/debug.hpp>
 
 #include <wheels/support/assert.hpp>
-
 #include <wheels/support/progress.hpp>
 
 #include <fmt/core.h>
@@ -171,6 +170,7 @@ void TestRunner::ResetLogFile() {
 
 void TestRunner::WriteLogHeader() {
   std::ofstream log(*log_path_);
+  WHEELS_VERIFY(!log.fail(), "Failed to open " << *log_path_);
   log << "Whirl simulator log" << std::endl;
   log.close();
 }
