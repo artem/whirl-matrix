@@ -14,6 +14,8 @@ namespace whirl::matrix {
 // NB: Time model is accessed from "userspace" => do not allocate memory
 // in method calls
 
+// TODO: ITimeModel -> IBehaviour
+
 /////////////////////////////////////////////////////////////////////
 
 struct IServerTimeModel {
@@ -39,6 +41,11 @@ struct IServerTimeModel {
 
   virtual Jiffies DiskWrite(size_t bytes) = 0;
   virtual Jiffies DiskRead(size_t bytes) = 0;
+
+  // Database
+
+  virtual bool GetCacheMiss() = 0;
+  virtual bool IteratorCacheMiss() = 0;
 
   // Threads
 

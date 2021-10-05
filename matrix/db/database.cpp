@@ -1,9 +1,14 @@
 #include <matrix/db/database.hpp>
 
+#include <matrix/db/snapshot.hpp>
+
 #include <matrix/world/global/random.hpp>
 #include <matrix/world/global/log.hpp>
+#include <matrix/world/global/time_model.hpp>
 
 #include <matrix/log/bytes.hpp>
+
+#include <wheels/memory/view_of.hpp>
 
 #include <timber/log.hpp>
 
@@ -14,17 +19,22 @@ using whirl::node::db::WriteBatch;
 namespace whirl::matrix::db {
 
 Database::Database(node::fs::IFileSystem* fs)
-    : fs_(fs), logger_("Database", GetLogBackend()) {
+    : fs_(fs),
+      logger_("Database", GetLogBackend()) {
 }
 
 void Database::Open(const std::string& directory) {
-  wal_path_ = directory + "/wal";
-  wal_.emplace(fs_, wal_path_);
-  ReplayWAL();
+  dir_ = fs_->MakePath(directory);
+
+  auto wal_path = LogPath();
+  wal_.emplace(fs_, wal_path);
+  ReplayWAL(wal_path);
+
+  PrepareSSTable();
 }
 
 void Database::Put(const Key& key, const Value& value) {
-  LOG_INFO("Put('{}', '{}')", key, log::FormatMessage(value));
+  //LOG_INFO("Put('{}', '{}')", key, log::FormatMessage(value));
 
   node::db::WriteBatch batch;
   batch.Put(key, value);
@@ -32,20 +42,31 @@ void Database::Put(const Key& key, const Value& value) {
 }
 
 void Database::Delete(const Key& key) {
-  LOG_INFO("Delete('{}')", key);
+  //LOG_INFO("Delete('{}')", key);
 
   node::db::WriteBatch batch;
   batch.Delete(key);
-  Write(batch);
+  DoWrite(batch);
 }
 
 std::optional<Value> Database::TryGet(const Key& key) const {
-  if (ReadCacheMiss()) {
-    // TODO
-    // disk_.Read(1);  // Access SSTable-s
-  }
   LOG_INFO("TryGet({})", key);
+
+  if (ThisServerTimeModel()->GetCacheMiss()) {
+    AccessSSTable();
+  }
   return mem_table_.TryGet(key);
+}
+
+void Database::IteratorMove() {
+  if (ThisServerTimeModel()->IteratorCacheMiss()) {
+    AccessSSTable();
+  }
+}
+
+node::db::ISnapshotPtr Database::MakeSnapshot() {
+  LOG_INFO("Make snapshot at version {}", version_);
+  return std::make_shared<Snapshot>(this, mem_table_.GetEntries(), version_);
 }
 
 void Database::Write(WriteBatch batch) {
@@ -58,6 +79,7 @@ void Database::DoWrite(WriteBatch& batch) {
 
   wal_->Append(batch);
   ApplyToMemTable(batch);
+  ++version_;
 }
 
 void Database::ApplyToMemTable(const node::db::WriteBatch& batch) {
@@ -75,27 +97,44 @@ void Database::ApplyToMemTable(const node::db::WriteBatch& batch) {
   }
 }
 
-bool Database::ReadCacheMiss() const {
-  // return GlobalRandomNumber(10) == 1;  // Move to time model?
-  return false;
-}
-
-void Database::ReplayWAL() {
+void Database::ReplayWAL(node::fs::Path wal_path) {
   mem_table_.Clear();
 
   LOG_INFO("Replaying WAL -> MemTable");
 
-  if (!fs_->Exists(wal_path_)) {
+  if (!fs_->Exists(wal_path)) {
     return;
   }
 
-  WALReader wal_reader(fs_, wal_path_);
+  version_ = 0;
+
+  WALReader wal_reader(fs_, wal_path);
 
   while (auto batch = wal_reader.ReadNext()) {
     ApplyToMemTable(*batch);
+    ++version_;
   }
 
   LOG_INFO("MemTable populated");
+}
+
+// Emulate read latency
+
+void Database::PrepareSSTable() {
+  auto sstable_path = SSTablePath();
+  if (!fs_->Exists(sstable_path)) {
+    fs_->Create(sstable_path).ExpectOk();
+
+    node::fs::FileWriter writer(fs_, sstable_path);
+    writer.Write(wheels::ViewOf("data"));
+  }
+}
+
+void Database::AccessSSTable() const {
+  LOG_INFO("Cache miss, access SSTable on disk");
+  node::fs::FileReader reader(SSTablePath());
+  char buf[128];
+  reader.ReadSome(wheels::MutViewOf(buf));
 }
 
 }  // namespace whirl::matrix::db

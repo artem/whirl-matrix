@@ -36,6 +36,16 @@ class AdversaryTimeModel : public IServerTimeModel {
     return 1;
   }
 
+  // Database
+
+  bool GetCacheMiss() override {
+    return false;
+  }
+
+  bool IteratorCacheMiss() override {
+    return false;
+  }
+
   // Threads
 
   Jiffies ThreadPause() override {

@@ -9,6 +9,8 @@
 #include <muesli/serialize.hpp>
 #include <muesli/archives.hpp>
 
+#include <wheels/support/assert.hpp>
+
 namespace whirl::matrix {
 
 //////////////////////////////////////////////////////////////////////
@@ -46,6 +48,8 @@ Tracer::Tracer(const std::string& path)
     : file_(path),
       file_adapter_(file_),
       writer_(file_adapter_) {
+
+  WHEELS_VERIFY(!file_.fail(), "Failed to open '" << path << "'");
 
   writer_.SetIndent(' ', 2);
   writer_.StartArray();
@@ -143,7 +147,7 @@ void Tracer::WriteRequest(commute::rpc::proto::Request req) {
   WriteMessage(writer_, req.input);
 }
 
-void Tracer::Stop() {
+void Tracer::Finalize() {
   writer_.EndArray();
   file_ << std::endl;
   file_.flush();

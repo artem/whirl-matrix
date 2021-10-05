@@ -159,7 +159,7 @@ size_t World::Stop() {
   // Finalize
 
   if (tracer_) {
-    tracer_->Stop();
+    tracer_->Finalize();
   }
 
   history_recorder_.Finalize();

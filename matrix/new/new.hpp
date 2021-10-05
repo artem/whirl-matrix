@@ -50,6 +50,4 @@ class GlobalAllocatorGuard : public AllocatorGuard {
   }
 };
 
-
-
 }  // namespace whirl::matrix

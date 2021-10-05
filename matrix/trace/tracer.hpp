@@ -10,7 +10,7 @@ struct ITracer {
   virtual void Deliver(const net::Frame& frame) = 0;
 
   // After last `Deliver`
-  virtual void Stop() = 0;
+  virtual void Finalize() = 0;
 };
 
 }  // namespace whirl::matrix
