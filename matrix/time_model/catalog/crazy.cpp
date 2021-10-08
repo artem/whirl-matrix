@@ -71,6 +71,9 @@ class CrazyServerTimeModel : public IServerTimeModel {
 
 class CrazyTimeModel : public ITimeModel {
  public:
+  void Initialize() override {
+  }
+
   TimePoint GlobalStartTime() override {
     return GlobalRandomNumber(1, 200);
   }

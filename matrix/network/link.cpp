@@ -32,9 +32,6 @@ Frame Link::MakeFrame(Packet packet) {
 }
 
 TimePoint Link::ChooseDeliveryTime(const Packet& packet) const {
-  if (IsLoopBack()) {
-    return GlobalNow() + 1;
-  }
   const auto flight_time = TimeModel()->FlightTime(Start(), End(), packet);
   return GlobalNow() + flight_time.Count();
 }
