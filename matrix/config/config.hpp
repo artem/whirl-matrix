@@ -8,6 +8,8 @@
 
 #include <fmt/core.h>
 
+#include <any>
+
 namespace whirl::matrix::cfg {
 
 class NodeConfig : public node::cfg::IConfig {
@@ -23,6 +25,8 @@ class NodeConfig : public node::cfg::IConfig {
   [[noreturn]] static void KeyNotFound(std::string_view key) {
     throw std::runtime_error(fmt::format("Key '{}' not found in configuration file", key));
   }
+
+  std::any TryGetGlobal(std::string_view key) const;
 
  private:
   ServerConfig server_;

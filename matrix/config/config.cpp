@@ -1,5 +1,7 @@
 #include <matrix/config/config.hpp>
 
+#include <matrix/world/global/vars.hpp>
+
 namespace whirl::matrix::cfg {
 
 std::string NodeConfig::GetString(std::string_view key) const {
@@ -14,6 +16,16 @@ std::string NodeConfig::GetString(std::string_view key) const {
   if (key == "db.path") {
     return "/db";
   }
+
+  // Globals
+
+  {
+    auto value = TryGetGlobal(key);
+    if (value.has_value()) {
+      return std::any_cast<std::string>(value);
+    }
+  }
+
   KeyNotFound(key);
 }
 
@@ -43,11 +55,36 @@ int64_t NodeConfig::GetInt64(std::string_view key) const {
     return TimeModel()->BackoffParams().factor;
   }
 
+  // Globals
+
+  {
+    auto value = TryGetGlobal(key);
+    if (value.has_value()) {
+      return std::any_cast<int64_t>(value);
+    }
+  }
+
+
   KeyNotFound(key);
 }
 
 bool NodeConfig::GetBool(std::string_view key) const {
+  // Globals
+
+  {
+    auto value = TryGetGlobal(key);
+    if (value.has_value()) {
+      return std::any_cast<bool>(value);
+    }
+  }
+
+
   KeyNotFound(key);
+}
+
+std::any NodeConfig::TryGetGlobal(std::string_view key) const {
+  auto var = fmt::format("config.{}", key);
+  return matrix::detail::GetGlobal(var);
 }
 
 }  // namespace whirl::matrix::cfg
