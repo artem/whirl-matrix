@@ -59,6 +59,8 @@ using IServerTimeModelPtr = std::unique_ptr<IServerTimeModel>;
 struct ITimeModel {
   virtual ~ITimeModel() = default;
 
+  virtual void Initialize() = 0;
+
   virtual TimePoint GlobalStartTime() = 0;
 
   // Server

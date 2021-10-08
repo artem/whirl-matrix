@@ -41,6 +41,8 @@ void World::Start() {
   SetStartTime();
   start_time_ = time_.Now();
 
+  time_model_->Initialize();
+
   // Start network:
   AddActor(&network_);
   Scope(network_)->Start();
