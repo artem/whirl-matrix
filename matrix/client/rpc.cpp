@@ -31,7 +31,9 @@ static std::string MakeAddress(const std::string& host, uint16_t port) {
 }
 
 ::commute::rpc::IChannelPtr MakeRpcChannel(const std::string& pool_name,
-                                           uint16_t port) {
+                                           uint16_t port,
+                                           bool log_retries) {
+
   auto pool = node::rt::Discovery()->ListPool(pool_name);
 
   auto client = MakeRpcClient();
@@ -42,16 +44,27 @@ static std::string MakeAddress(const std::string& host, uint16_t port) {
     transports.push_back(client->Dial(MakeAddress(host, port)));
   }
 
-  // Retries -> History -> Random -> Transport-s
+  auto random = rpc::MakeRandomChannel(std::move(transports),
+                                       node::rt::RandomService());
 
-  auto random =
-      rpc::MakeRandomChannel(std::move(transports), node::rt::RandomService());
-  auto history = MakeHistoryChannel(std::move(random));
-  auto retries =
-      commute::rpc::WithRetries(std::move(history), node::rt::TimeService(),
-                                node::rt::LoggerBackend(), RetriesBackoff());
+  if (log_retries) {
+    // Retries -> History -> Random -> [Transport]
 
-  return retries;
+    auto history = MakeHistoryChannel(std::move(random));
+    auto retries =
+        commute::rpc::WithRetries(std::move(history), node::rt::TimeService(),
+                                  node::rt::LoggerBackend(), RetriesBackoff());
+    return retries;
+
+  } else {
+    // History -> Retries -> Random -> [Transport]
+
+    auto retries =
+        commute::rpc::WithRetries(std::move(random), node::rt::TimeService(),
+                                  node::rt::LoggerBackend(), RetriesBackoff());
+    auto history = MakeHistoryChannel(std::move(retries));
+    return history;
+  }
 }
 
 }  // namespace whirl::matrix::client
