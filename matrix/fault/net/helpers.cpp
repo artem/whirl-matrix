@@ -5,7 +5,7 @@
 namespace whirl::matrix::fault::net {
 
 void Shuffle(std::vector<std::string>& pool) {
-  for (size_t i = 0; i + 1 < pool.size()) {
+  for (size_t i = 0; i + 1 < pool.size(); ++i) {
     int j = node::rt::RandomNumber(i, pool.size() - 1);
     std::swap(pool[i], pool[j]);
   }
