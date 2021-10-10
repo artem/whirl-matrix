@@ -37,7 +37,10 @@ class CrazyServerTimeModel : public IServerTimeModel {
   // TrueTime
 
   Jiffies TrueTimeUncertainty() override {
-    return GlobalRandomNumber(5, 500);
+    if (GlobalRandomNumber() % 7 == 0) {
+      return GlobalRandomNumber(300, 1000);
+    }
+    return GlobalRandomNumber(5, 50);
   }
 
   // Disk
@@ -53,11 +56,11 @@ class CrazyServerTimeModel : public IServerTimeModel {
   // Database
 
   bool GetCacheMiss() override {
-    return GlobalRandomNumber(3) == 0;
+    return GlobalRandomNumber(11) == 0;
   }
 
   bool IteratorCacheMiss() override {
-    return GlobalRandomNumber(11) == 0;
+    return GlobalRandomNumber(17) == 0;
   }
 
   // Threads
@@ -93,9 +96,19 @@ class CrazyTimeModel : public ITimeModel {
       return 50;
     }
 
+    // Slow
+    if (GlobalRandomNumber() % 11 == 0) {
+      return GlobalRandomNumber(400, 1000);
+    }
+    // Fast
+    if (GlobalRandomNumber() % 7 == 0) {
+      return GlobalRandomNumber(5, 10);
+    }
+    // Unpredictable
     if (GlobalRandomNumber() % 5 == 0) {
       return GlobalRandomNumber(10, 1000);
     }
+    // Default
     return GlobalRandomNumber(30, 60);
   }
 
