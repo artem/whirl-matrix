@@ -69,6 +69,10 @@ struct ITimeModel {
 
   // Network
 
+  virtual Jiffies EstimateRtt() const {
+    return 1234;  // Backward compatibility
+  }
+
   // DPI =)
   virtual Jiffies FlightTime(const net::IServer* start, const net::IServer* end,
                              const net::Packet& packet) = 0;

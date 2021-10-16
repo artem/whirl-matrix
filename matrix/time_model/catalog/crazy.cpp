@@ -89,6 +89,10 @@ class CrazyTimeModel : public ITimeModel {
 
   // Network
 
+  Jiffies EstimateRtt() const override {
+    return 500;
+  }
+
   Jiffies FlightTime(const net::IServer* /*start*/, const net::IServer* /*end*/,
                      const net::Packet& packet) override {
     if (packet.header.type != net::Packet::Type::Data) {

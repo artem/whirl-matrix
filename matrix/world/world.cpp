@@ -31,6 +31,12 @@ ITimeModelPtr World::DefaultTimeModel() {
   return MakeCrazyTimeModel();
 }
 
+void World::SetConfigGlobals() {
+  // RTT estimation
+  Jiffies rtt = time_model_->EstimateRtt();
+  SetGlobal("config.net.rtt", (int64_t)rtt.Count());
+}
+
 void World::Start() {
   WorldGuard g(this);
 
@@ -50,6 +56,8 @@ void World::Start() {
   LOG_INFO("Cluster: {}, clients: {}", ClusterSize(), clients_.size());
 
   LOG_INFO("Starting cluster...");
+
+  SetConfigGlobals();
 
   // Start servers
   for (auto& [_, pool] : pools_) {

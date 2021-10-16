@@ -113,6 +113,7 @@ class World {
   }
 
   void Start();
+  void SetConfigGlobals();
 
   // Returns false if simulation is in deadlock state
   bool Step();
