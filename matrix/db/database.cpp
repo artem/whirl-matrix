@@ -126,7 +126,7 @@ void Database::PrepareSSTable() {
     fs_->Create(sstable_path).ExpectOk();
 
     node::fs::FileWriter writer(fs_, sstable_path);
-    writer.Write(wheels::ViewOf("data"));
+    writer.Write(wheels::ViewOf("data")).ExpectOk();
   }
 }
 
@@ -134,7 +134,7 @@ void Database::AccessSSTable() const {
   LOG_INFO("Cache miss, access SSTable on disk");
   node::fs::FileReader reader(SSTablePath());
   char buf[128];
-  reader.ReadSome(wheels::MutViewOf(buf));
+  reader.ReadSome(wheels::MutViewOf(buf)).ExpectOk();
 }
 
 }  // namespace whirl::matrix::db
