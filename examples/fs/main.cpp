@@ -22,7 +22,7 @@ void TestNode() {
 
   if (!node::rt::FileSystem()->Exists("/flag")) {
     node::fs::FileWriter file_writer("/file");
-    file_writer.Write(wheels::ViewOf("Hello, World!"));
+    file_writer.Write(wheels::ViewOf("Hello, World!")).ExpectOk();
 
     node::rt::Database()->Put("Test-Put", "Ok!");
     node::rt::Database()->Put("Test-Delete", "...");
@@ -52,7 +52,7 @@ void TestNode() {
 
   {
     node::fs::FileReader file_reader(node::rt::FileSystem(), "/file");
-    auto content = wheels::io::ReadAll(&file_reader);
+    auto content = wheels::io::ReadAll(&file_reader).ExpectValueOr("Failed to read from file");
     node::rt::PrintLine("Content of '{}': <{}>", "/file", content);
   }
 
