@@ -17,18 +17,18 @@ std::optional<std::string> FramedReader::ReadNextFrame() {
     return std::nullopt;
   }
   wheels::io::LimitReader frame_reader(reader_, header->size);
-  auto frame = wheels::io::ReadAll(&frame_reader);
+  auto frame = wheels::io::ReadAll(&frame_reader).ExpectValue();
   WHEELS_VERIFY(frame.length() == header->size, "Cannot read next frame");
   return frame;
 }
 
 std::optional<detail::FrameHeader> FramedReader::ReadNextFrameHeader() {
   detail::FrameHeader header;
-  size_t bytes_read = wheels::io::Read(reader_, detail::MutViewOf(header));
-  if (bytes_read == 0) {
+  wheels::Result<size_t> bytes_read = wheels::io::Read(reader_, detail::MutViewOf(header));
+  if (!bytes_read.IsOk() || *bytes_read == 0) {
     return std::nullopt;
   }
-  if (bytes_read < sizeof(detail::FrameHeader)) {
+  if (*bytes_read < sizeof(detail::FrameHeader)) {
     WHEELS_PANIC("Broken frame header");
   }
   return header;
@@ -41,17 +41,17 @@ void FramedWriter::WriteFrame(const std::string& data) {
   wheels::io::StringWriter frame_writer(frame);
 
   WriteFrameHeader(data, &frame_writer);
-  frame_writer.Write(wheels::ViewOf(data));
+  frame_writer.Write(wheels::ViewOf(data)).ExpectOk();
 
   // One frame = one write
-  writer_->Write(wheels::ViewOf(frame));
+  writer_->Write(wheels::ViewOf(frame)).ExpectOk("Failed to write frame header");
 }
 
 void FramedWriter::WriteFrameHeader(
     const std::string& frame,
     wheels::io::IWriter* writer) {
   detail::FrameHeader header{frame.length()};
-  writer->Write(detail::MutViewOf(header));
+  writer->Write(detail::MutViewOf(header)).ExpectOk();
 }
 
 }  // namespace whirl
