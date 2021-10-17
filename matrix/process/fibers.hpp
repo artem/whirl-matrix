@@ -2,12 +2,21 @@
 
 #include <await/fibers/core/manager.hpp>
 
+#include <cstring>
+#include <stack>
+
 namespace whirl::matrix::process {
 
 //////////////////////////////////////////////////////////////////////
 
+static const size_t kStackSize = 64 * 1024;
+
 struct FiberStack {
-  char buf[128 * 1024];
+  char buf[kStackSize];
+
+  void Reset() {
+    memset(buf, 0, kStackSize);
+  }
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -19,17 +28,29 @@ class FiberManager : public await::fibers::IFiberManager {
   }
 
   wheels::MutableMemView AcquireStack() override {
-    FiberStack* stack = new FiberStack{};
+    FiberStack* stack;
+
+    if (!pool_.empty()) {
+      // Reuse from pool
+      stack = pool_.top();
+      pool_.pop();
+      stack->Reset();
+    } else {
+      // Allocate new
+      stack = new FiberStack{};
+    }
+
     return {(char*)stack, sizeof(FiberStack)};
   }
 
   void ReleaseStack(wheels::MutableMemView view) override {
     FiberStack* stack = (FiberStack*)view.Begin();
-    delete stack;
+    pool_.push(stack);
   }
 
  private:
   size_t next_id_{0};
+  std::stack<FiberStack*> pool_;
 };
 
 }  // namespace whirl::matrix::process
