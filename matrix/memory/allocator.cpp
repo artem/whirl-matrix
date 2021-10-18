@@ -154,6 +154,7 @@ static BlockHeader* LocateBlockHeader(void* user_addr) {
 }
 
 void MemoryAllocator::Free(void* addr) {
+  WHIRL_ALLOC_VERIFY(addr != nullptr, "Suspicious delete nullptr");
   WHIRL_ALLOC_VERIFY(FromHere(addr), "Do not mess with heaps");
   BlockHeader* header = LocateBlockHeader(addr);
   WHIRL_ALLOC_VERIFY(header->canary == kCanary, "Memory allocator is broken");
