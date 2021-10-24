@@ -1,6 +1,6 @@
 #pragma once
 
-#include <whirl/node/fs/fs.hpp>
+#include <persist/fs/fs.hpp>
 
 #include <matrix/fs/file.hpp>
 #include <matrix/fs/path.hpp>
@@ -22,9 +22,9 @@ class FileSystem {
   using FileRef = std::shared_ptr<File>;
 
   struct OpenedFile {
-    node::fs::Fd fd;
-    node::fs::Path path;
-    node::fs::FileMode mode;
+    persist::fs::Fd fd;
+    persist::fs::Path path;
+    persist::fs::FileMode mode;
     size_t offset;
     FileRef file;
   };
@@ -61,21 +61,22 @@ class FileSystem {
 
   // Metadata
 
-  wheels::Result<bool> Create(const node::fs::Path& file_path);
-  wheels::Status Delete(const node::fs::Path& file_path);
-  bool Exists(const node::fs::Path& file_path) const;
+  wheels::Result<bool> Create(const persist::fs::Path& file_path);
+  wheels::Status Truncate(const persist::fs::Path& file_path, size_t new_size);
+  wheels::Status Unlink(const persist::fs::Path& file_path);
+  bool Exists(const persist::fs::Path& file_path) const;
 
   DirIterator ListAllFiles();
 
   // Data
 
-  wheels::Result<node::fs::Fd> Open(const node::fs::Path& file_path,
-                                    node::fs::FileMode mode);
+  wheels::Result<persist::fs::Fd> Open(const persist::fs::Path& file_path,
+                                    persist::fs::FileMode mode);
 
-  wheels::Result<size_t> Read(node::fs::Fd fd, wheels::MutableMemView buffer);
-  wheels::Status Append(node::fs::Fd fd, wheels::ConstMemView data);
-
-  wheels::Status Close(node::fs::Fd fd);
+  wheels::Result<size_t> Read(persist::fs::Fd fd, wheels::MutableMemView buffer);
+  wheels::Status Append(persist::fs::Fd fd, wheels::ConstMemView data);
+  wheels::Status Sync(persist::fs::Fd fd);
+  wheels::Status Close(persist::fs::Fd fd);
 
   // Paths
 
@@ -89,7 +90,7 @@ class FileSystem {
   // Simulation
 
   // Fault injection
-  void Corrupt(const node::fs::Path& file_path);
+  void Corrupt(const persist::fs::Path& file_path);
 
   // On crash
   void Reset();
@@ -97,16 +98,17 @@ class FileSystem {
   size_t ComputeDigest() const;
 
  private:
-  FileRef FindOrCreateFile(const node::fs::Path& file_path,
-                           node::fs::FileMode open_mode);
+  FileRef FindOrCreateFile(const persist::fs::Path& file_path,
+                           persist::fs::FileMode open_mode);
+  FileRef FindExistingFile(const persist::fs::Path& file_path);
 
   static FileRef CreateFile();
 
-  size_t InitOffset(FileRef f, node::fs::FileMode open_mode);
+  size_t InitOffset(FileRef f, persist::fs::FileMode open_mode);
 
-  void CheckMode(OpenedFile& of, node::fs::FileMode expected);
+  void CheckMode(OpenedFile& of, persist::fs::FileMode expected);
 
-  OpenedFile& GetOpenedFile(node::fs::Fd fd);
+  OpenedFile& GetOpenedFile(persist::fs::Fd fd);
 
   [[noreturn]] void RaiseError(const std::string& message);
 
@@ -115,8 +117,8 @@ class FileSystem {
   Files files_;
 
   // Process (volatile) state
-  std::map<node::fs::Fd, OpenedFile> opened_files_;
-  node::fs::Fd next_fd_{0};
+  std::map<persist::fs::Fd, OpenedFile> opened_files_;
+  persist::fs::Fd next_fd_{0};
 
   timber::Logger logger_;
 };

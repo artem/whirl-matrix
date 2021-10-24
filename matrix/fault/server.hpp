@@ -1,6 +1,6 @@
 #pragma once
 
-#include <whirl/node/fs/path.hpp>
+#include <persist/fs/path.hpp>
 
 #include <cstdlib>
 #include <string>
@@ -32,9 +32,9 @@ struct IFaultyServer {
 
   // Files
 
-  virtual node::fs::FileList ListFiles(std::string_view prefix) = 0;
+  virtual persist::fs::FileList ListFiles(std::string_view prefix) = 0;
 
-  virtual void CorruptFile(const node::fs::Path& path) = 0;
+  virtual void CorruptFile(const persist::fs::Path& path) = 0;
 };
 
 }  // namespace whirl::matrix::fault

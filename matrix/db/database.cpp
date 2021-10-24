@@ -18,7 +18,7 @@ using whirl::node::db::WriteBatch;
 
 namespace whirl::matrix::db {
 
-Database::Database(node::fs::IFileSystem* fs)
+Database::Database(persist::fs::IFileSystem* fs)
     : fs_(fs),
       logger_("Database", GetLogBackend()) {
 }
@@ -28,7 +28,7 @@ void Database::Open(const std::string& directory) {
 
   auto wal_path = LogPath();
   wal_.emplace(fs_, wal_path);
-  ReplayWAL(wal_path);
+  wal_->Open(ReplayWAL(wal_path));
 
   PrepareSSTable();
 }
@@ -97,13 +97,13 @@ void Database::ApplyToMemTable(const node::db::WriteBatch& batch) {
   }
 }
 
-void Database::ReplayWAL(node::fs::Path wal_path) {
+size_t Database::ReplayWAL(persist::fs::Path wal_path) {
   mem_table_.Clear();
 
   LOG_INFO("Replaying WAL -> MemTable");
 
   if (!fs_->Exists(wal_path)) {
-    return;
+    return 0;
   }
 
   version_ = 0;
@@ -116,6 +116,8 @@ void Database::ReplayWAL(node::fs::Path wal_path) {
   }
 
   LOG_INFO("MemTable populated");
+
+  return wal_reader.WriterOffset();
 }
 
 // Emulate read latency
@@ -125,14 +127,18 @@ void Database::PrepareSSTable() {
   if (!fs_->Exists(sstable_path)) {
     fs_->Create(sstable_path).ExpectOk();
 
-    node::fs::FileWriter writer(fs_, sstable_path);
+    persist::fs::FileWriter writer(fs_, sstable_path);
+    writer.Open().ExpectOk();
     writer.Write(wheels::ViewOf("data")).ExpectOk();
   }
 }
 
 void Database::AccessSSTable() const {
   LOG_INFO("Cache miss, access SSTable on disk");
-  node::fs::FileReader reader(SSTablePath());
+
+  persist::fs::FileReader reader(fs_, SSTablePath());
+  reader.Open().ExpectOk();
+
   char buf[128];
   reader.ReadSome(wheels::MutViewOf(buf)).ExpectOk();
 }

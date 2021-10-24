@@ -1,5 +1,7 @@
+#include <persist/fs/io/file_reader.hpp>
+#include <persist/fs/io/file_writer.hpp>
+
 #include <whirl/node/db/kv.hpp>
-#include <whirl/node/fs/io.hpp>
 
 #include <whirl/node/runtime/shortcuts.hpp>
 
@@ -20,8 +22,14 @@ void TestNode() {
   node::rt::Database()->Open(
       node::rt::Config()->GetString("db.path"));
 
-  if (!node::rt::FileSystem()->Exists("/flag")) {
-    node::fs::FileWriter file_writer("/file");
+  auto flag_fpath = node::rt::MakeFsPath("/flag");
+  auto test_fpath = node::rt::MakeFsPath("/file");
+
+  if (!node::rt::FileSystem()->Exists(flag_fpath)) {
+
+    persist::fs::FileWriter file_writer(node::rt::FileSystem(), test_fpath);
+
+    file_writer.Open().ExpectOk();
     file_writer.Write(wheels::ViewOf("Hello, World!")).ExpectOk();
 
     node::rt::Database()->Put("Test-Put", "Ok!");
@@ -34,7 +42,7 @@ void TestNode() {
     node::rt::FileSystem()->Create(chunks / "2").ExpectOk();
     node::rt::FileSystem()->Create(chunks / "3").ExpectOk();
 
-    node::rt::FileSystem()->Create("/flag").ExpectOk();
+    node::rt::FileSystem()->Create(flag_fpath).ExpectOk();
   }
 
   // Check database
@@ -51,7 +59,8 @@ void TestNode() {
   // Check file
 
   {
-    node::fs::FileReader file_reader(node::rt::FileSystem(), "/file");
+    persist::fs::FileReader file_reader(node::rt::FileSystem(), test_fpath);
+    file_reader.Open().ExpectOk();
     auto content = wheels::io::ReadAll(&file_reader).ExpectValueOr("Failed to read from file");
     node::rt::PrintLine("Content of '{}': <{}>", "/file", content);
   }

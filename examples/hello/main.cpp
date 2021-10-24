@@ -13,6 +13,8 @@ void HelloWorld() {
   node::rt::PrintLine("Hello, World!");
   node::rt::PrintLine("I am '{}' from pool '{}'", node::rt::HostName(),
                       node::rt::Config()->GetString("pool"));
+
+  node::rt::PrintLine("net.rtt: {}", node::rt::Config()->GetInt64("net.rtt"));
 }
 
 //////////////////////////////////////////////////////////////////////

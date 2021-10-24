@@ -9,6 +9,7 @@ namespace whirl::matrix::fs {
 class File {
  public:
   size_t Size() const;
+  void Truncate(size_t new_size);
   void Append(wheels::ConstMemView data);
   size_t PRead(size_t offset, wheels::MutableMemView buffer) const;
 

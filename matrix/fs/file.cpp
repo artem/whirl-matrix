@@ -11,6 +11,10 @@ size_t File::Size() const {
   return data_.size();
 }
 
+void File::Truncate(size_t new_size) {
+  data_.resize(new_size, 0);
+}
+
 void File::Append(wheels::ConstMemView append) {
   size_t curr_size = data_.size();
   size_t new_size = curr_size + append.Size();
