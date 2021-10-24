@@ -96,7 +96,7 @@ wheels::Status FileSystem::Truncate(const persist::fs::Path& file_path, size_t n
   GlobalAllocatorGuard g;
 
   auto f = FindExistingFile(file_path);
-  LOG_INFO("Truncate file {} to {}", file_path, new_size);
+  LOG_DEBUG("Truncate file {} to {}", file_path, new_size);
   f->Truncate(new_size);
   return result::Ok();
 }
