@@ -58,7 +58,6 @@ class WALReader {
  public:
   WALReader(persist::fs::IFileSystem* fs, persist::fs::Path file_path)
       : log_reader_(fs, file_path) {
-    log_reader_.Open();
   }
 
   std::optional<node::db::WriteBatch> ReadNext();
