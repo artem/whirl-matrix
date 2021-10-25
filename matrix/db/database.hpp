@@ -61,6 +61,9 @@ class Database : public node::db::IDatabase {
   void PrepareSSTable();
 
  private:
+  void EnsureOpened() const;
+
+ private:
   persist::fs::IFileSystem* fs_;
 
   std::optional<persist::fs::Path> dir_;

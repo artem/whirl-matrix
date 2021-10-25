@@ -9,6 +9,7 @@
 #include <matrix/log/bytes.hpp>
 
 #include <wheels/memory/view_of.hpp>
+#include <wheels/support/assert.hpp>
 
 #include <timber/log.hpp>
 
@@ -34,6 +35,8 @@ void Database::Open(const std::string& directory) {
 }
 
 void Database::Put(const Key& key, const Value& value) {
+  EnsureOpened();
+
   //LOG_INFO("Put('{}', '{}')", key, log::FormatMessage(value));
 
   node::db::WriteBatch batch;
@@ -42,6 +45,8 @@ void Database::Put(const Key& key, const Value& value) {
 }
 
 void Database::Delete(const Key& key) {
+  EnsureOpened();
+
   //LOG_INFO("Delete('{}')", key);
 
   node::db::WriteBatch batch;
@@ -50,6 +55,8 @@ void Database::Delete(const Key& key) {
 }
 
 std::optional<Value> Database::TryGet(const Key& key) const {
+  EnsureOpened();
+
   LOG_INFO("TryGet({})", key);
 
   if (ThisServerTimeModel()->GetCacheMiss()) {
@@ -65,11 +72,13 @@ void Database::IteratorMove() {
 }
 
 node::db::ISnapshotPtr Database::MakeSnapshot() {
+  EnsureOpened();
   LOG_INFO("Make snapshot at version {}", version_);
   return std::make_shared<Snapshot>(this, mem_table_.GetEntries(), version_);
 }
 
 void Database::Write(WriteBatch batch) {
+  EnsureOpened();
   LOG_INFO("Write({} mutations)", batch.muts.size());
   DoWrite(batch);
 }
@@ -141,6 +150,10 @@ void Database::AccessSSTable() const {
 
   char buf[128];
   reader.ReadSome(wheels::MutViewOf(buf)).ExpectOk();
+}
+
+void Database::EnsureOpened() const {
+  WHEELS_VERIFY(dir_.has_value(), "Open database first");
 }
 
 }  // namespace whirl::matrix::db
