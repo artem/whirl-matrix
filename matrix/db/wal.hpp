@@ -63,7 +63,7 @@ class WALReader {
   std::optional<node::db::WriteBatch> ReadNext();
 
   size_t WriterOffset() const {
-    return log_reader_.Offset();
+    return log_reader_.OffsetForWriter();
   }
 
  private:
