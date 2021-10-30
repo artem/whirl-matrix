@@ -35,6 +35,11 @@ Result<Fd> FileSystem::Open(const persist::fs::Path& file_path, FileMode mode) {
   GlobalAllocatorGuard g;
 
   auto file = FindOrCreateFile(file_path, mode);
+  if (!file) {
+    return result::Fail(
+        std::make_error_code(
+            std::errc::no_such_file_or_directory));
+  }
   Fd fd = ++next_fd_;
   size_t offset = InitOffset(file, mode);
   opened_files_.emplace(fd, OpenedFile{fd, file_path, mode, offset, file});
@@ -148,7 +153,7 @@ FileSystem::FileRef FileSystem::FindOrCreateFile(
       files_.insert({file_path.Repr(), f});
       return f;
     } else {
-      RaiseError("File not found");
+      return {};
     }
   }
 }
