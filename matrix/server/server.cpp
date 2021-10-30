@@ -116,8 +116,8 @@ void Server::AdjustWallClock() {
   }
 }
 
-node::fs::FileList Server::ListFiles(std::string_view prefix) {
-  node::fs::FileList listed;
+persist::fs::FileList Server::ListFiles(std::string_view prefix) {
+  persist::fs::FileList listed;
 
   auto iter = filesystem_.ListAllFiles();
   while (iter.IsValid()) {
@@ -129,7 +129,7 @@ node::fs::FileList Server::ListFiles(std::string_view prefix) {
   return listed;
 }
 
-void Server::CorruptFile(const node::fs::Path& file_path) {
+void Server::CorruptFile(const persist::fs::Path& file_path) {
   GlobalAllocatorGuard g;
   filesystem_.Corrupt(file_path);
 }

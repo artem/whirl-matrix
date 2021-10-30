@@ -5,11 +5,11 @@ using whirl::node::db::WriteBatch;
 namespace whirl::matrix::db {
 
 std::optional<WriteBatch> WALReader::ReadNext() {
-  auto frame = framed_reader_.ReadNextFrame();
-  if (!frame.has_value()) {
+  auto record = log_reader_.ReadNext();
+  if (!record.has_value()) {
     return std::nullopt;
   }
-  auto entry = muesli::Deserialize<WALEntry>(*frame);
+  auto entry = muesli::Deserialize<WALEntry>(*record);
   return node::db::WriteBatch{entry.muts};
 }
 

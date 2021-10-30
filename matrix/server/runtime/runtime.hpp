@@ -99,7 +99,7 @@ struct NodeRuntime : node::IRuntime {
     return true_time.Get();
   }
 
-  node::fs::IFileSystem* FileSystem() override {
+  persist::fs::IFileSystem* FileSystem() override {
     return fs.Get();
   }
 

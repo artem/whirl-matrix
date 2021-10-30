@@ -9,6 +9,7 @@
 #include <matrix/log/bytes.hpp>
 
 #include <wheels/memory/view_of.hpp>
+#include <wheels/support/assert.hpp>
 
 #include <timber/log.hpp>
 
@@ -18,7 +19,7 @@ using whirl::node::db::WriteBatch;
 
 namespace whirl::matrix::db {
 
-Database::Database(node::fs::IFileSystem* fs)
+Database::Database(persist::fs::IFileSystem* fs)
     : fs_(fs),
       logger_("Database", GetLogBackend()) {
 }
@@ -28,12 +29,14 @@ void Database::Open(const std::string& directory) {
 
   auto wal_path = LogPath();
   wal_.emplace(fs_, wal_path);
-  ReplayWAL(wal_path);
+  wal_->Open(ReplayWAL(wal_path));
 
   PrepareSSTable();
 }
 
 void Database::Put(const Key& key, const Value& value) {
+  EnsureOpened();
+
   //LOG_INFO("Put('{}', '{}')", key, log::FormatMessage(value));
 
   node::db::WriteBatch batch;
@@ -42,6 +45,8 @@ void Database::Put(const Key& key, const Value& value) {
 }
 
 void Database::Delete(const Key& key) {
+  EnsureOpened();
+
   //LOG_INFO("Delete('{}')", key);
 
   node::db::WriteBatch batch;
@@ -50,6 +55,8 @@ void Database::Delete(const Key& key) {
 }
 
 std::optional<Value> Database::TryGet(const Key& key) const {
+  EnsureOpened();
+
   LOG_INFO("TryGet({})", key);
 
   if (ThisServerTimeModel()->GetCacheMiss()) {
@@ -65,11 +72,13 @@ void Database::IteratorMove() {
 }
 
 node::db::ISnapshotPtr Database::MakeSnapshot() {
+  EnsureOpened();
   LOG_INFO("Make snapshot at version {}", version_);
   return std::make_shared<Snapshot>(this, mem_table_.GetEntries(), version_);
 }
 
 void Database::Write(WriteBatch batch) {
+  EnsureOpened();
   LOG_INFO("Write({} mutations)", batch.muts.size());
   DoWrite(batch);
 }
@@ -97,13 +106,13 @@ void Database::ApplyToMemTable(const node::db::WriteBatch& batch) {
   }
 }
 
-void Database::ReplayWAL(node::fs::Path wal_path) {
+size_t Database::ReplayWAL(persist::fs::Path wal_path) {
   mem_table_.Clear();
 
   LOG_INFO("Replaying WAL -> MemTable");
 
   if (!fs_->Exists(wal_path)) {
-    return;
+    return 0;
   }
 
   version_ = 0;
@@ -116,6 +125,8 @@ void Database::ReplayWAL(node::fs::Path wal_path) {
   }
 
   LOG_INFO("MemTable populated");
+
+  return wal_reader.WriterOffset();
 }
 
 // Emulate read latency
@@ -125,16 +136,24 @@ void Database::PrepareSSTable() {
   if (!fs_->Exists(sstable_path)) {
     fs_->Create(sstable_path).ExpectOk();
 
-    node::fs::FileWriter writer(fs_, sstable_path);
+    persist::fs::FileWriter writer(fs_, sstable_path);
+    writer.Open().ExpectOk();
     writer.Write(wheels::ViewOf("data")).ExpectOk();
   }
 }
 
 void Database::AccessSSTable() const {
   LOG_INFO("Cache miss, access SSTable on disk");
-  node::fs::FileReader reader(SSTablePath());
+
+  persist::fs::FileReader reader(fs_, SSTablePath());
+  reader.Open().ExpectOk();
+
   char buf[128];
   reader.ReadSome(wheels::MutViewOf(buf)).ExpectOk();
+}
+
+void Database::EnsureOpened() const {
+  WHEELS_VERIFY(dir_.has_value(), "Open database first");
 }
 
 }  // namespace whirl::matrix::db

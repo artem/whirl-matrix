@@ -1,6 +1,7 @@
 #pragma once
 
-#include <whirl/node/fs/fs.hpp>
+#include <persist/fs/fs.hpp>
+
 #include <whirl/node/time/time_service.hpp>
 
 #include <matrix/server/runtime/detail/disk.hpp>
@@ -8,32 +9,36 @@
 
 namespace whirl::matrix {
 
-class FS : public node::fs::IFileSystem {
+class FS : public persist::fs::IFileSystem {
  public:
   FS(matrix::fs::FileSystem* impl, node::time::ITimeService* time_service)
       : disk_(time_service), impl_(impl) {
   }
 
-  wheels::Result<bool> Create(const node::fs::Path& file_path) override {
+  wheels::Result<bool> Create(const persist::fs::Path& file_path) override {
     return impl_->Create(file_path);
   }
 
-  wheels::Status Delete(const node::fs::Path& file_path) override {
-    return impl_->Delete(file_path);
+  wheels::Status Unlink(const persist::fs::Path& file_path) override {
+    return impl_->Unlink(file_path);
   }
 
-  bool Exists(const node::fs::Path& file_path) const override {
+  wheels::Status Truncate(const persist::fs::Path& file_path, size_t new_length) override {
+    return impl_->Truncate(file_path, new_length);
+  }
+
+  bool Exists(const persist::fs::Path& file_path) const override {
     return impl_->Exists(file_path);
   }
 
-  node::fs::FileList ListFiles(std::string_view prefix) override {
+  persist::fs::FileList ListFiles(std::string_view prefix) override {
     // All allocations are made in "userspace"
-    node::fs::FileList listed;
+    persist::fs::FileList listed;
 
     auto iter = impl_->ListAllFiles();
     while (iter.IsValid()) {
       if ((*iter).starts_with(prefix)) {
-        listed.push_back({this, *iter});
+        listed.push_back(MakePath(*iter));
       }
       ++iter;
     }
@@ -42,39 +47,43 @@ class FS : public node::fs::IFileSystem {
   }
 
   // FileMode::Append creates file if it does not exist
-  wheels::Result<node::fs::Fd> Open(const node::fs::Path& file_path,
-                                    node::fs::FileMode mode) override {
+  wheels::Result<persist::fs::Fd> Open(const persist::fs::Path& file_path,
+                                    persist::fs::FileMode mode) override {
     return impl_->Open(file_path, mode);
   }
 
   // Only for FileMode::Append
-  wheels::Status Append(node::fs::Fd fd, wheels::ConstMemView data) override {
+  wheels::Status Append(persist::fs::Fd fd, wheels::ConstMemView data) override {
     disk_.Write(data.Size());
     return impl_->Append(fd, data);
   }
 
   // Only for FileMode::Read
-  wheels::Result<size_t> Read(node::fs::Fd fd,
+  wheels::Result<size_t> Read(persist::fs::Fd fd,
                               wheels::MutableMemView buffer) override {
     disk_.Read(buffer.Size());  // Blocks
     return impl_->Read(fd, buffer);
   }
 
-  wheels::Status Close(node::fs::Fd fd) override {
+  wheels::Status Sync(persist::fs::Fd fd) override {
+    return impl_->Sync(fd);
+  }
+
+  wheels::Status Close(persist::fs::Fd fd) override {
     return impl_->Close(fd);
   }
 
   // Paths
 
-  node::fs::Path MakePath(std::string_view repr) const override {
+  persist::fs::Path MakePath(std::string_view repr) const override {
     return {this, std::string{repr}};
   }
 
-  node::fs::Path RootPath() const override {
+  persist::fs::Path RootPath() const override {
     return {this, std::string(impl_->RootPath())};
   }
 
-  node::fs::Path TmpPath() const override {
+  persist::fs::Path TmpPath() const override {
     return {this, std::string(impl_->TmpPath())};
   }
 

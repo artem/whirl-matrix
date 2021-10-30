@@ -2,10 +2,9 @@
 
 #include <whirl/node/db/write_batch.hpp>
 
-#include <whirl/node/fs/fs.hpp>
-#include <whirl/node/fs/io.hpp>
-
-#include <matrix/db/detail/framed.hpp>
+#include <persist/fs/fs.hpp>
+#include <persist/log/reader.hpp>
+#include <persist/log/writer.hpp>
 
 #include <muesli/serialize.hpp>
 #include <muesli/serializable.hpp>
@@ -18,6 +17,8 @@ namespace whirl::matrix::db {
 
 // Write ahead log (WAL) writer / reader
 
+//////////////////////////////////////////////////////////////////////
+
 struct WALEntry {
   std::vector<node::db::Mutation> muts;
 
@@ -28,8 +29,12 @@ struct WALEntry {
 
 class WALWriter {
  public:
-  WALWriter(node::fs::IFileSystem* fs, node::fs::Path file_path)
-      : file_writer_(fs, file_path), framed_writer_(&file_writer_) {
+  WALWriter(persist::fs::IFileSystem* fs, persist::fs::Path file_path)
+      : log_writer_(fs, file_path) {
+  }
+
+  void Open(size_t offset) {
+    log_writer_.Open(offset).ExpectOk();
   }
 
   void Append(node::db::WriteBatch batch) {
@@ -39,30 +44,30 @@ class WALWriter {
  private:
   // Atomic
   void AppendImpl(WALEntry entry) {
-    framed_writer_.WriteFrame(muesli::Serialize(entry));
+    auto record = muesli::Serialize(entry);
+    log_writer_.Append(wheels::ViewOf(record)).ExpectOk();
   }
 
  private:
-  node::fs::FileWriter file_writer_;
-  FramedWriter framed_writer_;
+  persist::log::LogWriter log_writer_;
 };
 
 //////////////////////////////////////////////////////////////////////
 
 class WALReader {
  public:
-  WALReader(node::fs::IFileSystem* fs, node::fs::Path log_file_path)
-      : file_reader_(fs, log_file_path),
-        buf_file_reader_(&file_reader_),
-        framed_reader_(&buf_file_reader_) {
+  WALReader(persist::fs::IFileSystem* fs, persist::fs::Path file_path)
+      : log_reader_(fs, file_path) {
   }
 
   std::optional<node::db::WriteBatch> ReadNext();
 
+  size_t WriterOffset() const {
+    return log_reader_.Offset();
+  }
+
  private:
-  node::fs::FileReader file_reader_;
-  wheels::io::BufferedReader buf_file_reader_;
-  FramedReader framed_reader_;
+  persist::log::LogReader log_reader_;
 };
 
 }  // namespace whirl::matrix::db

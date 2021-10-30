@@ -3,7 +3,7 @@
 #include <whirl/node/db/database.hpp>
 #include <whirl/node/db/mutation.hpp>
 
-#include <whirl/node/fs/fs.hpp>
+#include <persist/fs/fs.hpp>
 
 #include <matrix/db/mem_table.hpp>
 #include <matrix/db/wal.hpp>
@@ -20,7 +20,7 @@ class Database : public node::db::IDatabase {
   friend class Iterator;
 
  public:
-  explicit Database(node::fs::IFileSystem* fs);
+  explicit Database(persist::fs::IFileSystem* fs);
 
   void Open(const std::string& directory) override;
 
@@ -42,17 +42,18 @@ class Database : public node::db::IDatabase {
   void DoWrite(node::db::WriteBatch& batch);
   void ApplyToMemTable(const node::db::WriteBatch& batch);
 
-  void ReplayWAL(node::fs::Path wal_path);
+  // Returns start offset for log writer
+  size_t ReplayWAL(persist::fs::Path wal_path);
 
   void IteratorMove();
 
-  node::fs::Path LogPath() const {
+  persist::fs::Path LogPath() const {
     return *dir_ / "wal";
   }
 
   // Emulate read latency
 
-  node::fs::Path SSTablePath() const {
+  persist::fs::Path SSTablePath() const {
     return *dir_ / "sstable";
   }
 
@@ -60,9 +61,12 @@ class Database : public node::db::IDatabase {
   void PrepareSSTable();
 
  private:
-  node::fs::IFileSystem* fs_;
+  void EnsureOpened() const;
 
-  std::optional<node::fs::Path> dir_;
+ private:
+  persist::fs::IFileSystem* fs_;
+
+  std::optional<persist::fs::Path> dir_;
 
   MemTable mem_table_;
   std::optional<WALWriter> wal_;

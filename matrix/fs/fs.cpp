@@ -10,8 +10,8 @@
 #include <wheels/result/result.hpp>
 #include <wheels/result/make.hpp>
 
-using whirl::node::fs::Fd;
-using whirl::node::fs::FileMode;
+using persist::fs::Fd;
+using persist::fs::FileMode;
 
 using wheels::Result;
 using wheels::Status;
@@ -25,16 +25,21 @@ FileSystem::FileSystem() : logger_("Filesystem", GetLogBackend()) {
 
 // System calls
 
-bool FileSystem::Exists(const node::fs::Path& file_path) const {
+bool FileSystem::Exists(const persist::fs::Path& file_path) const {
   // No allocations here!
 
   return files_.find(file_path.Repr()) != files_.end();
 }
 
-Result<Fd> FileSystem::Open(const node::fs::Path& file_path, FileMode mode) {
+Result<Fd> FileSystem::Open(const persist::fs::Path& file_path, FileMode mode) {
   GlobalAllocatorGuard g;
 
   auto file = FindOrCreateFile(file_path, mode);
+  if (!file) {
+    return result::Fail(
+        std::make_error_code(
+            std::errc::no_such_file_or_directory));
+  }
   Fd fd = ++next_fd_;
   size_t offset = InitOffset(file, mode);
   opened_files_.emplace(fd, OpenedFile{fd, file_path, mode, offset, file});
@@ -63,6 +68,10 @@ Status FileSystem::Append(Fd fd, wheels::ConstMemView data) {
   return result::Ok();
 }
 
+Status FileSystem::Sync(Fd /*fd*/) {
+  return result::Ok();
+}
+
 Status FileSystem::Close(Fd fd) {
   GlobalAllocatorGuard g;
 
@@ -75,7 +84,7 @@ Status FileSystem::Close(Fd fd) {
   }
 }
 
-Result<bool> FileSystem::Create(const node::fs::Path& file_path) {
+Result<bool> FileSystem::Create(const persist::fs::Path& file_path) {
   GlobalAllocatorGuard g;
 
   if (files_.contains(file_path.Repr())) {
@@ -88,7 +97,16 @@ Result<bool> FileSystem::Create(const node::fs::Path& file_path) {
   return result::Ok(true);
 }
 
-Status FileSystem::Delete(const node::fs::Path& file_path) {
+wheels::Status FileSystem::Truncate(const persist::fs::Path& file_path, size_t new_size) {
+  GlobalAllocatorGuard g;
+
+  auto f = FindExistingFile(file_path);
+  LOG_DEBUG("Truncate file {} to {}", file_path, new_size);
+  f->Truncate(new_size);
+  return result::Ok();
+}
+
+Status FileSystem::Unlink(const persist::fs::Path& file_path) {
   GlobalAllocatorGuard g;
 
   files_.erase(file_path.Repr());
@@ -122,7 +140,7 @@ std::string FileSystem::PathAppend(const std::string& base_path,
 }
 
 FileSystem::FileRef FileSystem::FindOrCreateFile(
-    const node::fs::Path& file_path, FileMode open_mode) {
+    const persist::fs::Path& file_path, FileMode open_mode) {
   auto it = files_.find(file_path.Repr());
 
   if (it != files_.end()) {
@@ -135,9 +153,17 @@ FileSystem::FileRef FileSystem::FindOrCreateFile(
       files_.insert({file_path.Repr(), f});
       return f;
     } else {
-      RaiseError("File not found");
+      return {};
     }
   }
+}
+
+FileSystem::FileRef FileSystem::FindExistingFile(const persist::fs::Path& file_path) {
+  auto it = files_.find(file_path.Repr());
+  if (it == files_.end()) {
+    RaiseError("File not found");
+  }
+  return it->second;
 }
 
 FileSystem::FileRef FileSystem::CreateFile() {
@@ -171,7 +197,7 @@ void FileSystem::RaiseError(const std::string& message) {
 
 // Simulation
 
-void FileSystem::Corrupt(const node::fs::Path& file_path) {
+void FileSystem::Corrupt(const persist::fs::Path& file_path) {
   WHEELS_UNUSED(file_path);
   // TODO
 }

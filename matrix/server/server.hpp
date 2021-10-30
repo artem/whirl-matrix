@@ -78,8 +78,8 @@ class Server : public IActor, public fault::IFaultyServer, public net::IServer {
 
   // - Filesystem
 
-  node::fs::FileList ListFiles(std::string_view prefix) override;
-  void CorruptFile(const node::fs::Path& target) override;
+  persist::fs::FileList ListFiles(std::string_view prefix) override;
+  void CorruptFile(const persist::fs::Path& target) override;
 
   // IActor
 
