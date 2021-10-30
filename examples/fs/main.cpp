@@ -25,9 +25,9 @@ void TestNode() {
   auto flag_fpath = node::rt::MakeFsPath("/flag");
   auto test_fpath = node::rt::MakeFsPath("/file");
 
-  if (!node::rt::FileSystem()->Exists(flag_fpath)) {
+  if (!node::rt::Fs()->Exists(flag_fpath)) {
 
-    persist::fs::FileWriter file_writer(node::rt::FileSystem(), test_fpath);
+    persist::fs::FileWriter file_writer(node::rt::Fs(), test_fpath);
 
     file_writer.Open().ExpectOk();
     file_writer.Write(wheels::ViewOf("Hello, World!")).ExpectOk();
@@ -36,13 +36,13 @@ void TestNode() {
     node::rt::Database()->Put("Test-Delete", "...");
     node::rt::Database()->Delete("Test-Delete");
 
-    auto chunks = node::rt::FsRootPath() / "chunks";
+    auto chunks = node::rt::Fs()->RootPath() / "chunks";
 
-    node::rt::FileSystem()->Create(chunks / "1").ExpectOk();
-    node::rt::FileSystem()->Create(chunks / "2").ExpectOk();
-    node::rt::FileSystem()->Create(chunks / "3").ExpectOk();
+    node::rt::Fs()->Create(chunks / "1").ExpectOk();
+    node::rt::Fs()->Create(chunks / "2").ExpectOk();
+    node::rt::Fs()->Create(chunks / "3").ExpectOk();
 
-    node::rt::FileSystem()->Create(flag_fpath).ExpectOk();
+    node::rt::Fs()->Create(flag_fpath).ExpectOk();
   }
 
   // Check database
@@ -59,7 +59,7 @@ void TestNode() {
   // Check file
 
   {
-    persist::fs::FileReader file_reader(node::rt::FileSystem(), test_fpath);
+    persist::fs::FileReader file_reader(node::rt::Fs(), test_fpath);
     file_reader.Open().ExpectOk();
     auto content = wheels::io::ReadAll(&file_reader).ExpectValueOr("Failed to read from file");
     node::rt::PrintLine("Content of '{}': <{}>", "/file", content);
@@ -69,7 +69,7 @@ void TestNode() {
 
   {
     node::rt::PrintLine("List chunks:");
-    auto chunks = node::rt::FileSystem()->ListFiles("/chunks/");
+    auto chunks = node::rt::Fs()->ListFiles("/chunks/");
     for (const auto& fpath : chunks) {
       node::rt::PrintLine("\tChunk: {}", fpath);
     }
