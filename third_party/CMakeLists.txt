@@ -13,6 +13,6 @@ message(STATUS "FetchContent: whirl-frontend")
 FetchContent_Declare(
         whirl-frontend
         GIT_REPOSITORY https://gitlab.com/whirl-framework/whirl-frontend.git
-        GIT_TAG ee48e193f9625c4aba08b967a5cb6ee054804b99
+        GIT_TAG 56923174f23dd6c7937ece3a5d10b2f2b06ec7ed
 )
 FetchContent_MakeAvailable(whirl-frontend)
