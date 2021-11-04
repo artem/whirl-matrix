@@ -92,6 +92,10 @@ class FS : public persist::fs::IFileSystem {
     return impl_->PathAppend(base, name);
   }
 
+  std::pair<std::string_view, std::string_view> PathSplit(const std::string& path) const override {
+    return impl_->PathSplit(path);
+  }
+
  private:
   // Emulate latency
   matrix::detail::Disk disk_;
