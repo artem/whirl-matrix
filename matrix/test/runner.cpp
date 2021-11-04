@@ -67,7 +67,7 @@ void TestRunner::RunSimulations(size_t count, uint32_t seq_seed) {
 
   for (size_t i = 1; i <= count; ++i) {
     if (verbose_) {
-      Verbose() << "Simulation " << i << "...";
+      Verbose() << "Simulation " << i << "..." << std::endl;
     }
 
     RunSimulation(/*seed=*/seeds());
