@@ -92,8 +92,8 @@ class FS : public persist::fs::IFileSystem {
     return impl_->PathAppend(base, name);
   }
 
-  std::string_view GetNameComponent(const std::string& path) const override {
-    return impl_->GetNameComponent(path);
+  std::pair<std::string_view, std::string_view> PathSplit(const std::string& path) const override {
+    return impl_->PathSplit(path);
   }
 
  private:

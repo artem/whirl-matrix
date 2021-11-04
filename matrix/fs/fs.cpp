@@ -139,14 +139,16 @@ std::string FileSystem::PathAppend(const std::string& base_path,
   }
 }
 
-std::string_view FileSystem::GetNameComponent(const std::string& path) const {
+std::pair<std::string_view, std::string_view> FileSystem::PathSplit(const std::string& path) const {
   std::string_view path_view = path;
 
   size_t split_pos = path_view.find_last_of('/');
   if (split_pos != std::string::npos) {
-    return path_view.substr(split_pos + 1);
+    auto parent = path_view.substr(0, split_pos);
+    auto name = path_view.substr(split_pos + 1, path_view.length());
+    return {parent, name};
   } else {
-    return {};
+    return {path, {}};
   }
 }
 
