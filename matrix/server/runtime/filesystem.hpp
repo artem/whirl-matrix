@@ -92,6 +92,10 @@ class FS : public persist::fs::IFileSystem {
     return impl_->PathAppend(base, name);
   }
 
+  std::string_view GetNameComponent(const std::string& path) const override {
+    return impl_->GetNameComponent(path);
+  }
+
  private:
   // Emulate latency
   matrix::detail::Disk disk_;

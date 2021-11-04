@@ -87,6 +87,8 @@ class FileSystem {
   std::string PathAppend(const std::string& base_path,
                          const std::string& name) const;
 
+  std::string_view GetNameComponent(const std::string& path) const;
+
   // Simulation
 
   // Fault injection

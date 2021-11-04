@@ -139,6 +139,17 @@ std::string FileSystem::PathAppend(const std::string& base_path,
   }
 }
 
+std::string_view FileSystem::GetNameComponent(const std::string& path) const {
+  std::string_view path_view = path;
+
+  size_t split_pos = path_view.find_last_of('/');
+  if (split_pos != std::string::npos) {
+    return path_view.substr(split_pos + 1);
+  } else {
+    return {};
+  }
+}
+
 FileSystem::FileRef FileSystem::FindOrCreateFile(
     const persist::fs::Path& file_path, FileMode open_mode) {
   auto it = files_.find(file_path.Repr());
