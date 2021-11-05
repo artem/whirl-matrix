@@ -65,6 +65,7 @@ class FileSystem {
   wheels::Status Truncate(const persist::fs::Path& file_path, size_t new_size);
   wheels::Status Unlink(const persist::fs::Path& file_path);
   bool Exists(const persist::fs::Path& file_path) const;
+  wheels::Status SyncDir(const persist::fs::Path& dir_path);
 
   DirIterator ListAllFiles();
 
