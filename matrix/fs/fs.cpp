@@ -68,6 +68,10 @@ Status FileSystem::Append(Fd fd, wheels::ConstMemView data) {
   return result::Ok();
 }
 
+Status FileSystem::SyncDir(const persist::fs::Path& /*sync_dir*/) {
+  return result::Ok();
+}
+
 Status FileSystem::Sync(Fd /*fd*/) {
   return result::Ok();
 }

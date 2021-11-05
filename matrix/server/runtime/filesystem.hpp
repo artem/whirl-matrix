@@ -46,6 +46,10 @@ class FS : public persist::fs::IFileSystem {
     return listed;
   }
 
+  wheels::Status SyncDir(const persist::fs::Path& dir_path) override {
+    return impl_->SyncDir(dir_path);
+  }
+
   // FileMode::Append creates file if it does not exist
   wheels::Result<persist::fs::Fd> Open(const persist::fs::Path& file_path,
                                     persist::fs::FileMode mode) override {
