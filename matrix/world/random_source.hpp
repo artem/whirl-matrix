@@ -18,15 +18,22 @@ class RandomSource {
   }
 
   void Reset(ResultType seed) {
+    steps_ = 0;
     impl_.seed(seed);
   }
 
   ResultType Next() {
+    ++steps_;
     return impl_();
+  }
+
+  size_t Steps() const {
+    return steps_;
   }
 
  private:
   Impl impl_;
+  size_t steps_ = 0;
 };
 
 }  // namespace whirl::matrix
