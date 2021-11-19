@@ -43,6 +43,10 @@ bool Server::IsAlive() const {
 }
 
 void Server::Crash() {
+#if __has_feature(address_sanitizer)
+  WHEELS_PANIC("Crashes are incompatible with Address Sanitizer");
+#endif
+
   GlobalAllocatorGuard g;
 
   WHEELS_VERIFY(state_ != State::Crashed, "Server already crashed");

@@ -6,6 +6,8 @@
 
 #include <timber/log.hpp>
 
+#include <cstdlib>
+
 namespace whirl::matrix {
 
 //////////////////////////////////////////////////////////////////////
@@ -130,6 +132,11 @@ std::optional<NextStep> World::FindNextStep() {
 
 size_t World::Stop() {
   WorldGuard g(this);
+
+#if __has_feature(address_sanitizer)
+  //std::quick_exit(0);
+  std::exit(0);
+#endif
 
   // Adversaries
 

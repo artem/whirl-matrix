@@ -9,6 +9,9 @@ await::fibers::FiberId FiberManager::GenerateId() {
 wheels::MutableMemView FiberManager::AcquireStack() {
   FiberStack* stack;
 
+#if __has_feature(address_sanitizer)
+  stack = new FiberStack{};
+#else
   if (!pool_.empty()) {
     // Reuse from pool
     stack = pool_.top();
@@ -18,13 +21,18 @@ wheels::MutableMemView FiberManager::AcquireStack() {
     // Allocate new
     stack = new FiberStack{};
   }
+#endif
 
   return {(char*)stack, sizeof(FiberStack)};
 }
 
 void FiberManager::ReleaseStack(wheels::MutableMemView view) {
-  FiberStack* stack = (FiberStack*)view.Begin();
+  FiberStack* stack = reinterpret_cast<FiberStack*>(view.Begin());
+#if __has_feature(address_sanitizer)
+  delete stack;
+#else
   pool_.push(stack);
+#endif
 }
 
 }  // namespace whirl::matrix::process

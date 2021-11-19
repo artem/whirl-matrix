@@ -7,6 +7,7 @@ option(WHIRL_MATRIX_DEVELOPER "Matrix development mode" OFF)
 option(WHIRL_MATRIX_EXAMPLES "Enable Matrix examples" OFF)
 
 include(cmake/CompileOptions.cmake)
+include(cmake/Sanitize.cmake)
 
 add_subdirectory(third_party)
 

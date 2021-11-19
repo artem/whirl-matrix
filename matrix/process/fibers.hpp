@@ -9,7 +9,7 @@ namespace whirl::matrix::process {
 
 //////////////////////////////////////////////////////////////////////
 
-static const size_t kStackSize = 64 * 1024;
+static const size_t kStackSize =  64 * 4 * 1024;
 
 struct FiberStack {
   char buf[kStackSize];
