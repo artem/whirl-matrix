@@ -96,6 +96,11 @@ bool World::Step() {
   digest_.Eat(next->time).Eat(next->actor_index);
 
   time_.FastForwardTo(next->time);
+
+  // For determinism violation debugging
+  LOG_TRACE("Next step: {}, actor: {}, random source touched: {} times",
+            step_number_, next->actor->Name(), random_source_.Steps());
+
   Scope(next->actor)->Step();
 
   return true;
