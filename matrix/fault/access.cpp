@@ -12,4 +12,8 @@ IFaultyNetwork& Network() {
   return World::Access()->GetNetwork();
 }
 
+INetworkListener& NetworkListener() {
+  return World::Access()->GetNetwork();
+}
+
 }  // namespace whirl::matrix::fault

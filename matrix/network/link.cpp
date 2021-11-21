@@ -65,6 +65,7 @@ void Link::Resume() {
 void Link::Add(Frame frame, TimePoint delivery_time) {
   frames_.Insert({frame, delivery_time});
   net_->AddLinkEvent(this, delivery_time);
+  net_->LogFrame(frame);
 }
 
 }  // namespace whirl::matrix::net

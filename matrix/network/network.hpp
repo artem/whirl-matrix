@@ -2,6 +2,7 @@
 
 #include <matrix/world/actor.hpp>
 #include <matrix/fault/network.hpp>
+#include <matrix/fault/listener.hpp>
 
 #include <matrix/network/link.hpp>
 #include <matrix/network/server.hpp>
@@ -12,6 +13,7 @@
 
 #include <string>
 #include <cstdlib>
+#include <deque>
 #include <vector>
 #include <set>
 
@@ -21,7 +23,9 @@ namespace whirl::matrix::net {
 
 using HostName = std::string;
 
-class Network : public IActor, public fault::IFaultyNetwork {
+class Network : public IActor,
+                public fault::IFaultyNetwork,
+                public fault::INetworkListener {
   friend class Link;
 
   struct LinkEvent {
@@ -78,6 +82,20 @@ class Network : public IActor, public fault::IFaultyNetwork {
   void Split(const fault::Partition& lhs) override;
   void Heal() override;
 
+  // INetworkListener
+
+  size_t FrameCount() const override {
+    return frames_log_.size();
+  }
+
+  const Frame& GetFrame(size_t index) const override {
+    return frames_log_.at(index);
+  }
+
+  void LogFrame(const Frame& frame) {
+    frames_log_.push_back(frame);
+  }
+
   // Misc
 
   size_t Digest() const {
@@ -97,6 +115,8 @@ class Network : public IActor, public fault::IFaultyNetwork {
   std::vector<IServer*> servers_;
   std::vector<Link> links_;
   LinkEvents events_;
+
+  std::deque<Frame> frames_log_;
 
   DigestCalculator digest_;
 
