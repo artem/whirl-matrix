@@ -89,7 +89,11 @@ void Server::Pause() {
     return;
   }
 
-  WHEELS_VERIFY(state_ != State::Paused, "Server already paused");
+  if (state_ == State::Paused) {
+    return;
+  }
+
+  //WHEELS_VERIFY(state_ != State::Paused, "Server already paused");
   state_ = State::Paused;
 }
 
