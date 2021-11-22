@@ -96,7 +96,7 @@ void Server::Pause() {
 void Server::Resume() {
   GlobalAllocatorGuard g;
 
-  if (!IsAlive()) {
+  if (state_ != State::Paused) {
     return;
   }
 
