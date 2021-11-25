@@ -62,25 +62,21 @@ void PrintAllocsTrackerReport() {
 
 //////////////////////////////////////////////////////////////////////
 
+#if !__has_feature(address_sanitizer)
+
 void* operator new(size_t size) {
-#if __has_feature(address_sanitizer)
-  return AllocateGlobal(size);
-#else
   if (allocator != nullptr) {
     return allocator->Allocate(size);
   }
   return AllocateGlobal(size);
-#endif
 }
 
 void operator delete(void* addr) noexcept {
-#if __has_feature(address_sanitizer)
-  return FreeGlobal(addr);
-#else
   if (allocator != nullptr) {
     allocator->Free(addr);
     return;
   }
   return FreeGlobal(addr);
-#endif
 }
+
+#endif

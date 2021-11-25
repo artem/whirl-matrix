@@ -25,6 +25,11 @@ TestRunner& TestRunner::Access() {
 }
 
 void TestRunner::TestDeterminism() {
+#if __has_feature(address_sanitizer)
+  std::cerr << "--det is incompatible with Address Sanitizer" << std::endl;
+  std::exit(1);
+#endif
+
   static const size_t kSeed = 104107713;
 
   Verbose() << "Test determinism with seed " << kSeed << ":" << std::endl;
@@ -55,6 +60,11 @@ void TestRunner::TestDeterminism() {
 }
 
 void TestRunner::RunSimulations(size_t count, uint32_t seq_seed) {
+  #if __has_feature(address_sanitizer)
+  std::cerr << "--sims is incompatible with Address Sanitizer" << std::endl;
+  std::exit(1);
+#endif
+
   std::mt19937 seeds{seq_seed};
 
   Report() << "Run " << count << " simulations..." << std::endl;
@@ -93,6 +103,10 @@ void TestRunner::Configure(facade::World& world) {
 
 void TestRunner::RunSingleSimulation(size_t seed) {
   Report() << "Run single simulation with seed = " << seed << std::endl;
+
+#if __has_feature(address_sanitizer)
+  Report() << "Address Sanitizer enabled" << std::endl;
+#endif
 
   size_t digest = RunSimulation(seed);
 
